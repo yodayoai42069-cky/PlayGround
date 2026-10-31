@@ -1,0 +1,1189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0c10">
+<meta name="color-scheme" content="dark">
+<title>Rep Rush — timing workout game</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23ff5a1f'/%3E%3Cpath d='M9 22V10h5.5a4 4 0 0 1 0 8H12' stroke='%23fff' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --panel: #11161d;
+    --panel-2: #161c25;
+    --line: #242d39;
+    --ink: #eef2f7;
+    --muted: #8c99ab;
+    --accent: #ff5a1f;
+    --accent-soft: #ffb020;
+    --good: #39e08a;
+    --bad: #ff4d5e;
+    --radius: 22px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { min-height: 100%; }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(900px 620px at 18% -12%, #1b2431 0%, transparent 62%),
+      radial-gradient(700px 500px at 96% 8%, rgba(255, 90, 31, 0.10) 0%, transparent 60%),
+      var(--bg);
+    color: var(--ink);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Inter, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  button { font: inherit; color: inherit; }
+
+  .app {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: max(14px, env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom));
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 2px 4px;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    font-size: 14px;
+  }
+
+  .brand .dot {
+    width: 13px;
+    height: 13px;
+    border-radius: 4px;
+    background: linear-gradient(140deg, var(--accent), var(--accent-soft));
+    box-shadow: 0 0 16px rgba(255, 90, 31, 0.65);
+  }
+
+  .top-actions { display: flex; gap: 8px; }
+
+  .ghost {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--line);
+    color: var(--muted);
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+  }
+
+  .ghost:hover, .ghost:focus-visible {
+    color: var(--ink);
+    border-color: #364152;
+    background: rgba(255, 255, 255, 0.07);
+    outline: none;
+  }
+
+  .stage {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1.06fr) minmax(0, 1fr);
+    gap: 14px;
+    align-items: stretch;
+  }
+
+  .panel {
+    position: relative;
+    background: linear-gradient(180deg, rgba(23, 29, 38, 0.92), rgba(15, 19, 25, 0.94));
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: hidden;
+  }
+
+  .panel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(150deg, rgba(255, 255, 255, 0.045), transparent 40%);
+  }
+
+  .athlete-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .eyebrow {
+    margin: 0 0 4px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .athlete-head h1 {
+    margin: 0;
+    font-size: clamp(20px, 2.4vw, 27px);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+  }
+
+  .set-chip {
+    flex: none;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--muted);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .set-chip b { color: var(--ink); }
+
+  .figure-wrap {
+    position: relative;
+    flex: 1;
+    min-height: 250px;
+    border-radius: 16px;
+    display: grid;
+    place-items: center;
+    background:
+      radial-gradient(60% 52% at 50% 78%, rgba(255, 90, 31, 0.16), transparent 70%),
+      linear-gradient(180deg, #0d1218, #0b0f14);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    overflow: hidden;
+  }
+
+  .figure-wrap::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    background-size: 34px 34px;
+    mask-image: radial-gradient(68% 72% at 50% 45%, #000 30%, transparent 100%);
+    pointer-events: none;
+  }
+
+  .figure { height: 100%; max-height: 380px; width: auto; overflow: visible; }
+
+  .shadow { fill: rgba(0, 0, 0, 0.5); }
+  .skin { fill: #e7b28c; }
+  .hair { fill: #2b1d19; }
+  .tank { fill: url(#tankShade); }
+  .band { fill: #1a1e25; }
+  .neckline { fill: #e7b28c; }
+  .leggings { fill: #171a20; }
+  .leggings-glow { fill: none; stroke: rgba(255, 255, 255, 0.10); stroke-width: 1.2; }
+  .shoe { fill: #e9edf2; }
+  .shoe-sole { fill: #ff5a1f; }
+
+  .figure .body,
+  .figure .arm,
+  .figure .leg { transform-box: view-box; }
+  .figure .body { transform-origin: 100px 250px; }
+  .figure .arm-l { transform-origin: 67px 62px; }
+  .figure .arm-r { transform-origin: 133px 62px; }
+  .figure .leg-l { transform-origin: 84px 132px; }
+  .figure .leg-r { transform-origin: 116px 132px; }
+
+  .figure.rep .arm-l { animation: arm-l 0.44s ease-in-out; }
+  .figure.rep .arm-r { animation: arm-r 0.44s ease-in-out; }
+  .figure.rep[data-ex="squat"] .body { animation: squat 0.44s ease-in-out; }
+  .figure.rep[data-ex="squat"] .leg-l,
+  .figure.rep[data-ex="squat"] .leg-r { animation: knee 0.44s ease-in-out; }
+  .figure.rep[data-ex="pushup"] .body { animation: dip 0.44s ease-in-out; }
+  .figure.rep[data-ex="swing"] .arm-l { animation: swing-l 0.44s ease-in-out; }
+  .figure.rep[data-ex="swing"] .arm-r { animation: swing-r 0.44s ease-in-out; }
+  .figure.miss .body { animation: shake 0.34s ease-in-out; }
+
+  @keyframes squat {
+    45% { transform: translateY(13px) scaleY(0.93); }
+    100% { transform: none; }
+  }
+  @keyframes knee {
+    45% { transform: rotate(6deg); }
+    100% { transform: none; }
+  }
+  @keyframes dip {
+    45% { transform: translateY(9px) rotate(-2.5deg); }
+    100% { transform: none; }
+  }
+  @keyframes arm-l {
+    45% { transform: rotate(26deg); }
+    100% { transform: none; }
+  }
+  @keyframes arm-r {
+    45% { transform: rotate(-26deg); }
+    100% { transform: none; }
+  }
+  @keyframes swing-l {
+    40% { transform: rotate(-62deg); }
+    72% { transform: rotate(30deg); }
+    100% { transform: none; }
+  }
+  @keyframes swing-r {
+    40% { transform: rotate(62deg); }
+    72% { transform: rotate(-30deg); }
+    100% { transform: none; }
+  }
+  @keyframes shake {
+    20% { transform: translateX(-5px); }
+    40% { transform: translateX(5px); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(3px); }
+    100% { transform: none; }
+  }
+
+  .pips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .pips span {
+    width: 100%;
+    max-width: 22px;
+    height: 8px;
+    flex: 1 1 8px;
+    border-radius: 999px;
+    background: #222b36;
+    transition: background 0.15s, box-shadow 0.15s;
+  }
+
+  .pips span.done {
+    background: linear-gradient(90deg, var(--accent-soft), var(--accent));
+    box-shadow: 0 0 10px rgba(255, 90, 31, 0.45);
+  }
+
+  .meters { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .meter label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .meter .bar {
+    height: 7px;
+    border-radius: 999px;
+    background: #1e2731;
+    overflow: hidden;
+  }
+
+  .meter .bar i {
+    display: block;
+    height: 100%;
+    width: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #2bd47c, #7df0b4);
+    transition: width 0.2s ease, background 0.2s;
+  }
+
+  .meter.burn .bar i {
+    background: linear-gradient(90deg, #ff8a3d, #ffd166);
+  }
+
+  .play-panel { justify-content: flex-start; }
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .stat {
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 13px;
+    padding: 9px 10px;
+  }
+
+  .stat span {
+    display: block;
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+
+  .stat b {
+    font-size: clamp(17px, 2vw, 21px);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
+  .timing { display: flex; flex-direction: column; gap: 10px; margin-top: auto; }
+
+  .callout {
+    min-height: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+
+  .callout.rest { color: var(--accent-soft); }
+
+  .feedback {
+    height: 26px;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.12s, transform 0.12s;
+  }
+
+  .feedback.show { opacity: 1; transform: none; }
+  .feedback.clean { color: var(--good); }
+  .feedback.perfect { color: var(--accent-soft); }
+  .feedback.miss { color: var(--bad); }
+
+  .track {
+    position: relative;
+    height: 62px;
+    border-radius: 15px;
+    background:
+      repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 32px),
+      #0b1016;
+    border: 1px solid #26303d;
+    overflow: hidden;
+    touch-action: manipulation;
+  }
+
+  .track .zone,
+  .track .perfect {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 40%;
+    width: 20%;
+  }
+
+  .track .zone {
+    background: linear-gradient(90deg, rgba(57, 224, 138, 0.08), rgba(57, 224, 138, 0.30), rgba(57, 224, 138, 0.08));
+    border-left: 1px solid rgba(57, 224, 138, 0.45);
+    border-right: 1px solid rgba(57, 224, 138, 0.45);
+  }
+
+  .track .perfect {
+    background: linear-gradient(90deg, rgba(255, 209, 102, 0.10), rgba(255, 209, 102, 0.38), rgba(255, 209, 102, 0.10));
+    border-left: 1px solid rgba(255, 209, 102, 0.5);
+    border-right: 1px solid rgba(255, 209, 102, 0.5);
+  }
+
+  .track .centerline {
+    position: absolute;
+    left: 50%;
+    top: 6px;
+    bottom: 6px;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  .marker {
+    position: absolute;
+    top: -2px;
+    bottom: -2px;
+    left: 0;
+    width: 4px;
+    margin-left: -2px;
+    border-radius: 3px;
+    background: #ffffff;
+    box-shadow: 0 0 14px rgba(255, 255, 255, 0.9), 0 0 34px rgba(255, 90, 31, 0.85);
+    will-change: left;
+  }
+
+  .marker::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: -5px;
+    width: 12px;
+    height: 12px;
+    margin-left: -6px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 16px rgba(255, 255, 255, 0.85);
+  }
+
+  .rep-btn {
+    width: 100%;
+    height: 66px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: linear-gradient(180deg, #ff6d31, #ef420b);
+    box-shadow: 0 12px 30px -12px rgba(255, 90, 31, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: transform 0.06s, filter 0.15s;
+  }
+
+  .rep-btn:hover { filter: brightness(1.06); }
+  .rep-btn:active { transform: translateY(2px) scale(0.995); }
+  .rep-btn:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+  .rep-btn:disabled { filter: grayscale(0.6) brightness(0.6); cursor: default; }
+
+  .hint {
+    margin: 0;
+    text-align: center;
+    font-size: 11px;
+    color: #6f7c8e;
+    letter-spacing: 0.04em;
+  }
+
+  .plan { display: grid; gap: 6px; margin-top: 4px; margin-bottom: auto; }
+
+  .plan-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.055);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 11px;
+    padding: 7px 11px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .plan-row b { flex: 1; color: var(--ink); font-weight: 600; }
+  .plan-row .sm { display: none; }
+  .plan-row .reps { font-variant-numeric: tabular-nums; }
+  .plan-row .badge {
+    min-width: 44px;
+    text-align: center;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #6f7c8e;
+  }
+
+  .plan-row.current {
+    border-color: rgba(255, 90, 31, 0.4);
+    background: rgba(255, 90, 31, 0.08);
+    color: #c3cedd;
+  }
+
+  .plan-row.current .badge { color: var(--accent-soft); }
+  .plan-row.done { opacity: 0.55; }
+  .plan-row.done .badge { color: var(--good); }
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    background: rgba(5, 7, 10, 0.74);
+    backdrop-filter: blur(10px);
+  }
+
+  .overlay[hidden] { display: none; }
+
+  .card {
+    width: min(520px, 100%);
+    max-height: calc(100dvh - 36px);
+    overflow: auto;
+    background: linear-gradient(180deg, #181e27, #10151b);
+    border: 1px solid #2a3441;
+    border-radius: 24px;
+    padding: 26px;
+    box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.9);
+  }
+
+  .card h2 {
+    margin: 0 0 8px;
+    font-size: clamp(26px, 5vw, 34px);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+  }
+
+  .card h2 em { color: var(--accent); font-style: normal; }
+
+  .card p { margin: 0 0 16px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+
+  .card ul {
+    list-style: none;
+    margin: 0 0 20px;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+  }
+
+  .card li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.025);
+    border-radius: 12px;
+    padding: 10px 13px;
+    font-size: 13px;
+  }
+
+  .card li b { font-weight: 700; }
+  .card li span { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  .cta {
+    width: 100%;
+    height: 54px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 14px;
+    background: linear-gradient(180deg, #ff6d31, #ef420b);
+    box-shadow: 0 14px 34px -14px rgba(255, 90, 31, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    cursor: pointer;
+    transition: transform 0.06s, filter 0.15s;
+  }
+
+  .cta:hover { filter: brightness(1.06); }
+  .cta:active { transform: translateY(2px); }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+    margin: 18px 0 20px;
+  }
+
+  .summary-grid div {
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.025);
+    border-radius: 12px;
+    padding: 10px 12px;
+  }
+
+  .summary-grid span {
+    display: block;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+
+  .summary-grid b { font-size: 19px; font-variant-numeric: tabular-nums; }
+
+  .grade-row { display: flex; align-items: center; gap: 14px; margin-bottom: 4px; }
+
+  .grade {
+    flex: none;
+    width: 62px;
+    height: 62px;
+    border-radius: 18px;
+    display: grid;
+    place-items: center;
+    font-size: 30px;
+    font-weight: 900;
+    background: linear-gradient(150deg, rgba(255, 90, 31, 0.25), rgba(255, 209, 102, 0.12));
+    border: 1px solid rgba(255, 160, 80, 0.4);
+    color: var(--accent-soft);
+  }
+
+  .grade-row p { margin: 0; }
+
+  .pause-card { text-align: center; }
+  .pause-card p { margin-bottom: 20px; }
+
+  @media (max-width: 880px) {
+    .stage { grid-template-columns: 1fr; }
+    .figure-wrap { min-height: 180px; max-height: 220px; }
+    .figure { max-height: 210px; }
+    .panel { padding: 15px; gap: 12px; }
+    .stat { padding: 8px; }
+    .stat b { font-size: 18px; }
+    .plan { grid-auto-flow: column; grid-auto-columns: 1fr; gap: 6px; }
+    .plan-row { flex-direction: column; align-items: flex-start; gap: 1px; padding: 7px 9px; font-size: 11px; }
+    .plan-row b { flex: none; font-size: 11px; }
+    .plan-row .lg { display: none; }
+    .plan-row .sm { display: inline; }
+    .plan-row .badge { display: none; }
+    .plan-row .reps { font-size: 10px; }
+  }
+
+  @media (max-width: 420px) {
+    .app { padding-left: 12px; padding-right: 12px; }
+    .stats { gap: 6px; }
+    .stat b { font-size: 16px; }
+    .rep-btn { height: 58px; }
+    .track { height: 54px; }
+    .athlete-head h1 { font-size: 20px; }
+  }
+
+  @media (max-height: 720px) and (min-width: 881px) {
+    .figure-wrap { min-height: 210px; }
+    .figure { max-height: 260px; }
+    .panel { padding: 15px; gap: 11px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app" data-ready="false">
+  <header class="topbar">
+    <div class="brand"><span class="dot" aria-hidden="true"></span> REP RUSH</div>
+    <div class="top-actions">
+      <button class="ghost" id="btn-sound" type="button">Sound: on</button>
+      <button class="ghost" id="btn-pause" type="button">Pause</button>
+    </div>
+  </header>
+
+  <main class="stage">
+    <section class="panel" aria-label="Athlete">
+      <div class="athlete-head">
+        <div>
+          <p class="eyebrow">Today's session</p>
+          <h1 id="ex-name">Bodyweight Squat</h1>
+        </div>
+        <div class="set-chip">Set <b id="set-index">1</b>/3</div>
+      </div>
+
+      <div class="figure-wrap">
+        <svg class="figure" id="figure" viewBox="0 0 200 280" role="img" aria-label="Athlete in a white tank top and black leggings">
+          <defs>
+            <linearGradient id="tankShade" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#ffffff"/>
+              <stop offset="1" stop-color="#dde3ea"/>
+            </linearGradient>
+          </defs>
+          <ellipse class="shadow" cx="100" cy="263" rx="46" ry="8"/>
+          <g class="body">
+            <path class="hair" d="M115 17c16 4 21 16 19 29-2 12-10 20-21 22 7-17 7-35 2-51Z"/>
+            <circle class="skin" cx="100" cy="31" r="16"/>
+            <path class="hair" d="M84 31c-1-9 6-17 16-17s17 8 16 17c-3-7-8-10-16-10s-13 3-16 10Z"/>
+            <circle class="skin" cx="115" cy="33" r="3.2"/>
+            <rect class="skin" x="94" y="44" width="12" height="13" rx="5"/>
+
+            <g class="leg leg-l">
+              <path class="leggings" d="M76 126h23l-1 96c0 6-4 10-10 10h-2c-6 0-9-4-9-10l-1-96Z"/>
+              <path class="leggings-glow" d="M82 132l-1 92"/>
+              <rect class="shoe" x="66" y="230" width="31" height="17" rx="6"/>
+              <rect class="shoe-sole" x="64" y="243" width="35" height="6" rx="3"/>
+            </g>
+            <g class="leg leg-r">
+              <path class="leggings" d="M101 126h23l1 96c0 6-3 10-9 10h-2c-6 0-10-4-10-10l-1-96Z"/>
+              <path class="leggings-glow" d="M118 132l1 92"/>
+              <rect class="shoe" x="103" y="230" width="31" height="17" rx="6"/>
+              <rect class="shoe-sole" x="101" y="243" width="35" height="6" rx="3"/>
+            </g>
+
+            <path class="tank" d="M82 52h36c8 0 13 5 14 12l3 42c0 7-4 12-10 13-9 2-18 3-25 3s-16-1-25-3c-6-1-10-6-10-13l3-42c1-7 6-12 14-12Z"/>
+            <path class="neckline" d="M89 52q11 13 22 0v-1H89Z"/>
+            <rect class="band" x="71" y="119" width="58" height="11" rx="5"/>
+
+            <g class="arm arm-l">
+              <rect class="skin" x="61" y="60" width="11" height="53" rx="5.5"/>
+              <circle class="skin" cx="66.5" cy="113" r="6"/>
+            </g>
+            <g class="arm arm-r">
+              <rect class="skin" x="128" y="60" width="11" height="53" rx="5.5"/>
+              <circle class="skin" cx="133.5" cy="113" r="6"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <div class="pips" id="pips" aria-hidden="true"></div>
+
+      <div class="meters">
+        <div class="meter">
+          <label for="form-fill">Form <span id="form-value">100%</span></label>
+          <div class="bar"><i id="form-fill"></i></div>
+        </div>
+        <div class="meter burn">
+          <label for="burn-fill">Burn <span id="burn-value">0%</span></label>
+          <div class="bar"><i id="burn-fill" style="width:0%"></i></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel play-panel" aria-label="Timing controls">
+      <div class="stats">
+        <div class="stat"><span>Reps</span><b id="stat-reps">0</b></div>
+        <div class="stat"><span>Streak</span><b id="stat-streak">0</b></div>
+        <div class="stat"><span>Score</span><b id="stat-score">0</b></div>
+        <div class="stat"><span>Time</span><b id="stat-time">0:00</b></div>
+      </div>
+
+      <div class="timing">
+        <p class="callout" id="callout">Press <b>Start</b> to warm up.</p>
+        <div class="feedback" id="feedback" aria-live="polite"></div>
+        <div class="track" id="track" aria-hidden="true">
+          <div class="zone" id="zone"></div>
+          <div class="perfect" id="perfect"></div>
+          <div class="centerline"></div>
+          <div class="marker" id="marker" style="left:0%"></div>
+        </div>
+      </div>
+
+      <div class="plan" id="plan" aria-label="Session plan"></div>
+
+      <div class="controls">
+        <button class="rep-btn" id="btn-rep" type="button">REP</button>
+        <p class="hint">Space / tap · P pause · M mute</p>
+      </div>
+    </section>
+  </main>
+
+  <div class="overlay" id="overlay-menu">
+    <div class="card">
+      <p class="eyebrow">Timing workout · 3 sets</p>
+      <h2>Hit the zone.<br><em>Own every rep.</em></h2>
+      <p>Tap <b>REP</b> or press space when the marker sweeps through the green band. Perfect timing scores more. Miss too often and your form breaks.</p>
+      <ul id="menu-list"></ul>
+      <button class="cta" id="btn-start" type="button" data-auto-start>Start</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay-summary" hidden>
+    <div class="card">
+      <div class="grade-row">
+        <div class="grade" id="grade">A</div>
+        <div>
+          <p class="eyebrow" id="summary-reason">Session complete</p>
+          <h2 style="font-size:26px;margin:0">Nice work.</h2>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div><span>Total reps</span><b id="sum-reps">0</b></div>
+        <div><span>Best streak</span><b id="sum-streak">0</b></div>
+        <div><span>Perfect reps</span><b id="sum-perfect">0</b></div>
+        <div><span>Accuracy</span><b id="sum-accuracy">0%</b></div>
+        <div><span>Score</span><b id="sum-score">0</b></div>
+        <div><span>Time</span><b id="sum-time">0:00</b></div>
+      </div>
+      <button class="cta" id="btn-again" type="button">Start</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay-pause" hidden>
+    <div class="card pause-card">
+      <p class="eyebrow">Paused</p>
+      <h2 style="font-size:28px">Catch your breath.</h2>
+      <p>The clock and the marker are stopped.</p>
+      <button class="cta" id="btn-resume" type="button">Resume</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  const EXERCISES = [
+    { id: 'squat', name: 'Bodyweight Squat', short: 'Squat', reps: 10, speed: 0.82, zone: 0.10 },
+    { id: 'pushup', name: 'Push-Up', short: 'Push-Up', reps: 8, speed: 0.98, zone: 0.085 },
+    { id: 'swing', name: 'Kettlebell Swing', short: 'Swing', reps: 12, speed: 1.12, zone: 0.075 },
+  ];
+
+  const $ = (id) => document.getElementById(id);
+  const figure = $('figure');
+  const marker = $('marker');
+  const zoneEl = $('zone');
+  const perfectEl = $('perfect');
+  const pipsEl = $('pips');
+  const calloutEl = $('callout');
+  const feedbackEl = $('feedback');
+
+  const state = {
+    mode: 'menu',
+    exIndex: 0,
+    repsInSet: 0,
+    total: 0,
+    perfect: 0,
+    attempts: 0,
+    streak: 0,
+    best: 0,
+    score: 0,
+    form: 100,
+    burn: 0,
+    startedAt: 0,
+    elapsed: 0,
+    restUntil: 0,
+    paused: false,
+    soundOn: true,
+  };
+
+  let markerPos = 0;
+  let markerDir = 1;
+  let lastFrame = performance.now();
+  let repTimer = 0;
+  let feedbackTimer = 0;
+  let audio = null;
+  let pips = [];
+
+  const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
+
+  function formatTime(seconds) {
+    const s = Math.max(0, Math.floor(seconds));
+    return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  }
+
+  function beep(freq, duration, type = 'sine') {
+    if (!state.soundOn) return;
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      if (!audio) audio = new Ctx();
+      if (audio.state === 'suspended') audio.resume();
+      const osc = audio.createOscillator();
+      const gain = audio.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.0001, audio.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.12, audio.currentTime + 0.008);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audio.destination);
+      osc.start();
+      osc.stop(audio.currentTime + duration + 0.02);
+    } catch { /* audio is optional */ }
+  }
+
+  function setCallout(text, rest = false) {
+    if (calloutEl.textContent !== text) calloutEl.textContent = text;
+    calloutEl.classList.toggle('rest', rest);
+  }
+
+  function flash(tone, text) {
+    feedbackEl.textContent = text;
+    feedbackEl.className = 'feedback show ' + tone;
+    clearTimeout(feedbackTimer);
+    feedbackTimer = setTimeout(() => {
+      feedbackEl.className = 'feedback ' + tone;
+    }, 850);
+  }
+
+  function buildPips(count) {
+    pipsEl.textContent = '';
+    pips = [];
+    for (let i = 0; i < count; i++) {
+      const pip = document.createElement('span');
+      pipsEl.appendChild(pip);
+      pips.push(pip);
+    }
+  }
+
+  function fillPip(index) {
+    if (pips[index]) pips[index].classList.add('done');
+  }
+
+  function updatePlan() {
+    $('plan').innerHTML = EXERCISES.map((ex, index) => {
+      let status = 'Later';
+      let cls = '';
+      if (state.mode === 'done' || index < state.exIndex) {
+        status = 'Done';
+        cls = ' done';
+      } else if (index === state.exIndex) {
+        if (state.mode === 'rest' && state.repsInSet >= ex.reps) {
+          status = 'Done';
+          cls = ' done';
+        } else {
+          status = 'Now';
+          cls = ' current';
+        }
+      }
+      return '<div class="plan-row' + cls + '"><b><span class="lg">' + ex.name +
+        '</span><span class="sm">' + ex.short + '</span></b><span class="reps">' +
+        ex.reps + ' reps</span><span class="badge">' + status + '</span></div>';
+    }).join('');
+  }
+
+  function applyExercise() {
+    const ex = EXERCISES[state.exIndex];
+    $('ex-name').textContent = ex.name;
+    $('set-index').textContent = String(state.exIndex + 1);
+    figure.dataset.ex = ex.id;
+    zoneEl.style.left = ((0.5 - ex.zone) * 100).toFixed(2) + '%';
+    zoneEl.style.width = (ex.zone * 200).toFixed(2) + '%';
+    perfectEl.style.left = ((0.5 - ex.zone * 0.35) * 100).toFixed(2) + '%';
+    perfectEl.style.width = (ex.zone * 70).toFixed(2) + '%';
+    buildPips(ex.reps);
+    setCallout('Time your rep — hit the green band.');
+    updatePlan();
+  }
+
+  function updateHUD() {
+    $('stat-reps').textContent = String(state.total);
+    $('stat-streak').textContent = String(state.streak);
+    $('stat-score').textContent = String(state.score);
+    $('form-fill').style.width = clamp(state.form, 0, 100) + '%';
+    $('form-value').textContent = Math.round(state.form) + '%';
+    $('burn-fill').style.width = clamp(state.burn, 0, 100) + '%';
+    $('burn-value').textContent = Math.round(state.burn) + '%';
+  }
+
+  function updateTime() {
+    $('stat-time').textContent = formatTime(state.elapsed);
+  }
+
+  function setPlaying(playing) {
+    $('btn-rep').disabled = !playing;
+    $('btn-pause').disabled = state.mode === 'menu' || state.mode === 'done';
+  }
+
+  function startGame() {
+    state.mode = 'active';
+    state.exIndex = 0;
+    state.repsInSet = 0;
+    state.total = 0;
+    state.perfect = 0;
+    state.attempts = 0;
+    state.streak = 0;
+    state.best = 0;
+    state.score = 0;
+    state.form = 100;
+    state.burn = 0;
+    state.startedAt = performance.now();
+    state.elapsed = 0;
+    state.paused = false;
+    markerPos = 0;
+    markerDir = 1;
+    marker.style.left = '0%';
+    $('overlay-menu').hidden = true;
+    $('overlay-summary').hidden = true;
+    $('overlay-pause').hidden = true;
+    feedbackEl.className = 'feedback';
+    applyExercise();
+    updateHUD();
+    updateTime();
+    setPlaying(true);
+    beep(520, 0.08);
+  }
+
+  function finish(reason) {
+    state.mode = 'done';
+    state.paused = false;
+    setPlaying(false);
+    $('overlay-pause').hidden = true;
+    const accuracy = state.attempts ? state.total / state.attempts : 0;
+    const perfectRatio = state.total ? state.perfect / state.total : 0;
+    let grade = 'D';
+    if (state.total >= 18 && accuracy >= 0.95 && perfectRatio >= 0.45) grade = 'S';
+    else if (accuracy >= 0.9) grade = 'A';
+    else if (accuracy >= 0.78) grade = 'B';
+    else if (accuracy >= 0.62) grade = 'C';
+    $('grade').textContent = grade;
+    $('summary-reason').textContent = reason === 'gassed' ? 'Form broken — session over' : 'Session complete';
+    $('sum-reps').textContent = String(state.total);
+    $('sum-streak').textContent = String(state.best);
+    $('sum-perfect').textContent = String(state.perfect);
+    $('sum-accuracy').textContent = Math.round(accuracy * 100) + '%';
+    $('sum-score').textContent = String(state.score);
+    $('sum-time').textContent = formatTime(state.elapsed);
+    updatePlan();
+    $('overlay-summary').hidden = false;
+    beep(reason === 'gassed' ? 240 : 780, 0.14);
+  }
+
+  function completeSet() {
+    state.score += 250;
+    state.mode = 'rest';
+    const isLast = state.exIndex >= EXERCISES.length - 1;
+    if (isLast) {
+      updateHUD();
+      finish('complete');
+      return;
+    }
+    state.restUntil = performance.now() + 4200;
+    $('btn-rep').disabled = true;
+    state.burn = clamp(state.burn + 6, 0, 100);
+    flash('perfect', 'SET COMPLETE +250');
+    beep(900, 0.12);
+    updateHUD();
+    updatePlan();
+  }
+
+  function nextExercise() {
+    state.exIndex += 1;
+    state.repsInSet = 0;
+    state.mode = 'active';
+    applyExercise();
+    $('btn-rep').disabled = false;
+    updateHUD();
+    beep(620, 0.06);
+  }
+
+  function rep() {
+    if (state.mode !== 'active' || state.paused) return;
+    const ex = EXERCISES[state.exIndex];
+    state.attempts += 1;
+    const distance = Math.abs(markerPos - 0.5);
+
+    if (distance <= ex.zone) {
+      const isPerfect = distance <= ex.zone * 0.35;
+      state.total += 1;
+      state.repsInSet += 1;
+      state.streak += 1;
+      state.best = Math.max(state.best, state.streak);
+      if (isPerfect) state.perfect += 1;
+      const gain = (isPerfect ? 150 : 100) + state.streak * 5;
+      state.score += gain;
+      state.form = clamp(state.form + 2, 0, 100);
+      state.burn = clamp(state.burn + 100 / 28, 0, 100);
+      setCallout('Clean rep. Stay tight.');
+      flash(isPerfect ? 'perfect' : 'clean', (isPerfect ? 'PERFECT +' : 'CLEAN +') + gain);
+      beep(isPerfect ? 920 : 680, 0.05);
+      figure.classList.remove('rep');
+      void figure.offsetWidth;
+      figure.classList.add('rep');
+      clearTimeout(repTimer);
+      repTimer = setTimeout(() => figure.classList.remove('rep'), 460);
+      fillPip(state.repsInSet - 1);
+      updateHUD();
+      if (state.repsInSet >= ex.reps) completeSet();
+    } else {
+      state.streak = 0;
+      state.form = clamp(state.form - 14, 0, 100);
+      state.score = Math.max(0, state.score - 25);
+      setCallout('Off tempo. Reset and find the band.');
+      flash('miss', 'MISS — FORM -14');
+      beep(170, 0.1, 'sawtooth');
+      figure.classList.remove('miss');
+      void figure.offsetWidth;
+      figure.classList.add('miss');
+      setTimeout(() => figure.classList.remove('miss'), 360);
+      updateHUD();
+      if (state.form <= 0) finish('gassed');
+    }
+  }
+
+  function togglePause() {
+    if (state.mode !== 'active' && state.mode !== 'rest') return;
+    state.paused = !state.paused;
+    $('overlay-pause').hidden = !state.paused;
+    if (state.paused) {
+      $('btn-rep').disabled = true;
+    } else {
+      markerDir = markerDir || 1;
+      lastFrame = performance.now();
+      if (state.mode === 'active') $('btn-rep').disabled = false;
+    }
+  }
+
+  function toggleSound() {
+    state.soundOn = !state.soundOn;
+    $('btn-sound').textContent = 'Sound: ' + (state.soundOn ? 'on' : 'off');
+  }
+
+  function frame(now) {
+    const dt = Math.min(0.05, (now - lastFrame) / 1000);
+    lastFrame = now;
+
+    if (state.mode === 'active' && !state.paused) {
+      const ex = EXERCISES[state.exIndex];
+      markerPos += markerDir * ex.speed * dt;
+      if (markerPos >= 1) { markerPos = 1; markerDir = -1; }
+      if (markerPos <= 0) { markerPos = 0; markerDir = 1; }
+      marker.style.left = (markerPos * 100).toFixed(3) + '%';
+      state.elapsed = (performance.now() - state.startedAt) / 1000;
+      updateTime();
+    }
+
+    if (state.mode === 'rest' && !state.paused) {
+      const remaining = Math.max(0, (state.restUntil - performance.now()) / 1000);
+      const next = EXERCISES[state.exIndex + 1];
+      if (next) {
+        setCallout('Rest ' + Math.ceil(remaining) + 's — next up: ' + next.name + '.', true);
+      }
+      if (remaining <= 0) nextExercise();
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  function init() {
+    $('menu-list').innerHTML = EXERCISES.map((ex) =>
+      '<li><b>' + ex.name + '</b><span>' + ex.reps + ' reps</span></li>'
+    ).join('');
+
+    $('btn-start').addEventListener('click', startGame);
+    $('btn-again').addEventListener('click', startGame);
+    $('btn-resume').addEventListener('click', togglePause);
+    $('btn-pause').addEventListener('click', togglePause);
+    $('btn-sound').addEventListener('click', toggleSound);
+    $('btn-rep').addEventListener('click', rep);
+
+    document.addEventListener('keydown', (event) => {
+      if (event.code === 'Space' || event.code === 'Enter') {
+        event.preventDefault();
+        if (state.mode === 'menu' || state.mode === 'done') {
+          if (!$('overlay-menu').hidden || !$('overlay-summary').hidden) startGame();
+        } else if (state.mode === 'active') {
+          rep();
+        }
+        return;
+      }
+      if (event.code === 'KeyP' || event.code === 'Escape') {
+        if (state.mode === 'active' || state.mode === 'rest') togglePause();
+      }
+      if (event.code === 'KeyM') toggleSound();
+    });
+
+    applyExercise();
+    // Keep the menu preview showing the first movement.
+    state.mode = 'menu';
+    updateHUD();
+    setPlaying(false);
+    requestAnimationFrame((now) => {
+      lastFrame = now;
+      frame(now);
+      requestAnimationFrame(() => { document.getElementById('app').dataset.ready = 'true'; });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>
