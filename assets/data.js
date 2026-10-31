@@ -23,6 +23,12 @@ export const HAIR_STYLES = [
   { id: 'bob', label: 'Bob' },
   { id: 'pony', label: 'Ponytail' },
   { id: 'pixie', label: 'Pixie' },
+  { id: 'hime', label: 'Hime cut' },
+  { id: 'braids', label: 'Braids' },
+  { id: 'twin', label: 'Twin tails' },
+  { id: 'spiky', label: 'Spiky' },
+  { id: 'long', label: 'Long & sleek' },
+  { id: 'side', label: 'Side sweep' },
 ];
 
 export const OUTFIT_COLORS = [
@@ -32,7 +38,46 @@ export const OUTFIT_COLORS = [
   { id: 'amber', color: '#cf9953', dark: '#a97839' },
   { id: 'plum', color: '#7a6a9d', dark: '#5b4d7b' },
   { id: 'clay', color: '#b65b5b', dark: '#8f4141' },
+  { id: 'mint', color: '#74b7a3', dark: '#4c8b78' },
+  { id: 'lemon', color: '#dfc35d', dark: '#b39731' },
+  { id: 'lilac', color: '#b08bc9', dark: '#8964a6' },
+  { id: 'charcoal', color: '#4d5666', dark: '#333b49' },
 ];
+
+export const OUTFIT_STYLES = [
+  { id: 'tee', label: 'T-shirt' },
+  { id: 'hoodie', label: 'Hoodie' },
+  { id: 'jacket', label: 'Bomber jacket' },
+  { id: 'cardigan', label: 'Cardigan' },
+  { id: 'sundress', label: 'Sundress' },
+  { id: 'formal', label: 'Button-up' },
+  { id: 'sporty', label: 'Track top' },
+  { id: 'apron', label: 'Work apron' },
+];
+
+export const BODY_TYPES = [
+  { id: 'slim', label: 'Slim' },
+  { id: 'soft', label: 'Soft' },
+  { id: 'curvy', label: 'Curvy' },
+  { id: 'athletic', label: 'Athletic' },
+];
+
+export const PERKS = [
+  { id: 'trust-fund', name: 'Trust Fund', icon: 'coin', tag: 'Money', desc: 'Start with an extra $5,000 and a richer daily household base.' },
+  { id: 'silver-tongue', name: 'Silver Tongue', icon: 'heart', tag: 'Romance', desc: 'All affection gains are 25% stronger.' },
+  { id: 'bargain-heart', name: 'Bargain Heart', icon: 'gift', tag: 'Money', desc: 'Gifts and dates cost 20% less.' },
+  { id: 'family-fortune', name: 'Family Fortune', icon: 'work', tag: 'Money', desc: 'Grown offspring add 50% more daily income.' },
+  { id: 'fruitful-home', name: 'Fruitful Home', icon: 'family', tag: 'Family', desc: 'Welcoming and raising offspring costs 40% less.' },
+  { id: 'star-power', name: 'Star Power', icon: 'sparkle', tag: 'Energy', desc: 'Gain 20 extra max energy every day.' },
+];
+
+export const STARTING_FUNDS = 10000;
+export const MAKEOVER_COST = 500;
+export const DATE_COST = 250;
+export const PROPOSAL_COST = 1500;
+export const WEDDING_COST = 2500;
+export const OFFSPRING_COST = 1500;
+export const PERK_POINTS_START = 2;
 
 export const ACCESSORIES = [
   { id: 'none', label: 'None' },
@@ -40,6 +85,8 @@ export const ACCESSORIES = [
   { id: 'earrings', label: 'Earrings' },
   { id: 'hairpin', label: 'Hairpin' },
   { id: 'scarf', label: 'Neckerchief' },
+  { id: 'headphones', label: 'Headphones' },
+  { id: 'ribbon', label: 'Ribbon' },
 ];
 
 export const EYE_COLORS = [
@@ -102,67 +149,76 @@ export const LOCATIONS = {
   },
 };
 
+export const LOCATION_MAP = {
+  cafe: { x: 20, y: 26 },
+  library: { x: 48, y: 18 },
+  garden: { x: 75, y: 30 },
+  arcade: { x: 34, y: 58 },
+  bakery: { x: 63, y: 67 },
+  pier: { x: 85, y: 80 },
+};
+
 export const GIFTS = [
   {
     id: 'posy',
     name: 'Wildflower Posy',
-    cost: 30,
+    cost: 120,
     icon: 'flower',
     desc: 'A handful of whatever was blooming this morning.',
   },
   {
     id: 'tart',
     name: 'Strawberry Tart',
-    cost: 36,
+    cost: 144,
     icon: 'tart',
     desc: 'Crisp pastry, vanilla cream, and one perfect berry on top.',
   },
   {
     id: 'macarons',
     name: 'Rose Macarons',
-    cost: 42,
+    cost: 168,
     icon: 'macaron',
     desc: 'A little box of pastel, almond-sweet happiness.',
   },
   {
     id: 'poetry',
     name: 'Poetry Collection',
-    cost: 48,
+    cost: 192,
     icon: 'book',
     desc: 'A slim volume with dog-eared pages and a ribbon bookmark.',
   },
   {
     id: 'pen',
     name: 'Fountain Pen',
-    cost: 52,
+    cost: 208,
     icon: 'pen',
     desc: 'Ink the color of a late-summer evening.',
   },
   {
     id: 'mixtape',
     name: 'Retro Mixtape',
-    cost: 60,
+    cost: 240,
     icon: 'cassette',
     desc: 'Side A is for dancing. Side B is for the walk home.',
   },
   {
     id: 'charm',
     name: 'Sea-glass Charm',
-    cost: 68,
+    cost: 272,
     icon: 'shell',
     desc: 'A piece of green glass worn smooth by the tide.',
   },
   {
     id: 'hairpin',
     name: 'Star Hairpin',
-    cost: 72,
+    cost: 288,
     icon: 'star',
     desc: 'A tiny constellation that catches the light when you move.',
   },
   {
     id: 'scarf',
     name: 'Silk Scarf',
-    cost: 80,
+    cost: 320,
     icon: 'scarf',
     desc: 'A soft length of patterned silk, folded into a neat square.',
   },
@@ -447,7 +503,7 @@ export const CHILD_NAMES = [
 ];
 
 export const STAGES = ['New arrival', 'Little one', 'Growing', 'Grown'];
-export const STAGE_COSTS = [0, 90, 150, 240];
+export const STAGE_COSTS = [0, 600, 900, 1400];
 
 export const REL_STAGES = [
   { min: 0, label: 'New friend' },

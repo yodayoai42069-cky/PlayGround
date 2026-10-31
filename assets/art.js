@@ -61,10 +61,12 @@ function eyeGroup(cx, mirror, id, eyeColor, ink) {
   return `
     <g transform="translate(${cx} 244) scale(${mirror ? -1 : 1} 1)">
       <path d="M-21 -1 C-19 -12 -7 -18 6 -13 C14 -10 18 -2 14 5 C9 14 -5 15 -16 8 C-20 5 -22 3 -21 -1Z" fill="#fffaf7" stroke="${ink}" stroke-opacity=".22" stroke-width="1.3"/>
-      <ellipse cx="-1" cy="0" rx="8.6" ry="10.7" fill="url(#${id}-eye)"/>
-      <ellipse cx="-0.5" cy="1.3" rx="3.8" ry="5.4" fill="${ink}"/>
-      <circle cx="-3.4" cy="-3.2" r="2.5" fill="#fff" opacity=".92"/>
-      <circle cx="2.8" cy="3.7" r="1.35" fill="#fff" opacity=".8"/>
+      <ellipse cx="-1" cy="0" rx="9.2" ry="11.4" fill="url(#${id}-eye)"/>
+      <ellipse cx="-1" cy="2.4" rx="7.4" ry="7.6" fill="#fff" opacity=".14"/>
+      <ellipse cx="-0.5" cy="1.1" rx="4.2" ry="5.8" fill="${ink}"/>
+      <circle cx="-3.6" cy="-3.6" r="3" fill="#fff" opacity=".95"/>
+      <circle cx="2.9" cy="3.9" r="1.7" fill="#fff" opacity=".82"/>
+      <circle cx="-2.2" cy="5.2" r="1.1" fill="#fff" opacity=".6"/>
       <path d="M-22 -3 C-18 -15 -3 -20 12 -11" fill="none" stroke="${ink}" stroke-width="4.8" stroke-linecap="round"/>
       <path d="M-20 -1.5 C-22 1 -21 4 -17 6" fill="none" stroke="${ink}" stroke-width="2.1" stroke-linecap="round"/>
       <path d="M-15 9 C-8 13 3 12 10 8" fill="none" stroke="${ink}" stroke-opacity=".45" stroke-width="1.3" stroke-linecap="round"/>
@@ -95,6 +97,22 @@ function hairBack(style, id, hair, hairShade) {
   if (style === 'braids') {
     return `<path d="M139 219C129 126 169 80 230 80C292 80 332 127 321 219C325 250 326 280 319 306C301 291 289 265 291 239C270 256 190 256 169 239C171 265 159 291 141 306C134 280 135 250 139 219Z" fill="${fill}" ${stroke}/>
       <path d="M157 124C181 95 211 84 244 86" fill="none" stroke="#fff" stroke-opacity=".19" stroke-width="8" stroke-linecap="round"/>`;
+  }
+  if (style === 'twin') {
+    return `<path d="M139 219C128 128 171 80 230 80C292 80 333 129 321 219C327 253 330 286 321 316C312 338 293 347 272 342C288 320 289 294 282 270C263 286 197 286 178 270C171 294 172 320 188 342C165 347 147 338 139 316C130 286 133 253 139 219Z" fill="${fill}" ${stroke}/>
+      <path d="M148 128C118 149 101 187 107 231C111 262 123 283 138 300C128 264 131 229 145 202C158 176 172 151 186 135Z" fill="${fill}" ${stroke}/>
+      <path d="M312 128C342 149 359 187 353 231C349 262 337 283 322 300C332 264 329 229 315 202C302 176 288 151 274 135Z" fill="${fill}" ${stroke}/>
+      <path d="M160 128C183 96 215 84 247 87" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="8" stroke-linecap="round"/>`;
+  }
+  if (style === 'spiky') {
+    return `<path d="M142 221C132 143 168 88 230 86C294 88 330 143 318 221L305 194 297 222 283 188 270 216 258 183 246 211 234 180 222 209 210 182 198 212 186 186 174 215 162 191 150 218Z" fill="${fill}" ${stroke}/>
+      <path d="M169 130C191 103 218 94 246 97" fill="none" stroke="#fff" stroke-opacity=".2" stroke-width="7" stroke-linecap="round"/>`;
+  }
+  if (style === 'long') {
+    return hairBack('hime', id, hair, hairShade);
+  }
+  if (style === 'side') {
+    return hairBack('bob', id, hair, hairShade);
   }
   return `<path d="M138 223C126 120 168 75 230 75C293 75 335 121 323 223C332 276 342 355 335 447C329 495 317 522 295 542C304 496 299 451 288 419C268 444 192 444 172 419C161 451 156 496 165 542C143 522 131 495 125 447C118 355 129 276 138 223Z" fill="${fill}" ${stroke}/>
     <path d="M157 122C181 90 213 79 247 82" fill="none" stroke="#fff" stroke-opacity=".19" stroke-width="8" stroke-linecap="round"/>`;
@@ -128,6 +146,26 @@ function hairFront(style, id, hair, hairShade) {
       <path d="M167 161C185 187 216 198 246 190C260 186 272 179 282 169C280 185 271 196 257 204C238 215 218 216 201 207C186 199 174 181 167 161Z" fill="${fill}" opacity=".95"/>
       <path d="M171 128C195 111 222 106 251 111" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="7" stroke-linecap="round"/>
       <path d="M152 229C148 253 151 273 159 285C164 293 172 289 171 280C169 262 173 246 179 235Z" fill="${fill}" ${stroke}/>`;
+  }
+  if (style === 'twin') {
+    return `<path d="M145 219C143 137 179 92 231 92C284 92 318 137 315 219C302 197 291 183 279 175C266 196 248 205 229 205C210 205 193 196 182 175C168 185 155 199 145 219Z" fill="${fill}" ${stroke}/>
+      <path d="M161 177C181 200 208 210 236 204C258 199 276 190 286 177C284 195 274 208 259 217C240 228 217 229 200 220C184 211 169 197 161 177Z" fill="${fill}" opacity=".95"/>
+      <path d="M171 127C195 108 223 103 251 107" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="7" stroke-linecap="round"/>
+      <circle cx="128" cy="228" r="7" fill="${hairShade}"/><circle cx="332" cy="228" r="7" fill="${hairShade}"/>`;
+  }
+  if (style === 'spiky') {
+    return `<path d="M146 219C143 141 179 94 231 94C284 94 317 141 314 219L302 189 293 211 282 181 271 204 259 175 248 201 236 172 224 198 212 174 200 202 188 179 176 208 165 188 154 215Z" fill="${fill}" ${stroke}/>
+      <path d="M170 128C193 110 220 105 248 109" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="7" stroke-linecap="round"/>`;
+  }
+  if (style === 'long') {
+    return `<path d="M145 219C143 137 179 92 231 92C284 92 318 137 315 219C306 199 298 185 288 174C277 197 258 207 231 207C204 207 185 197 174 174C162 185 151 201 145 219Z" fill="${fill}" ${stroke}/>
+      <path d="M231 96C214 117 202 144 198 176C213 160 224 146 231 132C238 146 249 160 264 176C260 144 248 117 231 96Z" fill="${fill}" opacity=".96"/>
+      <path d="M167 126C192 107 220 101 250 105" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="7" stroke-linecap="round"/>`;
+  }
+  if (style === 'side') {
+    return `<path d="M145 219C143 137 179 92 231 92C284 92 318 137 315 219C304 192 290 176 271 167C248 186 219 195 189 186C174 191 158 202 145 219Z" fill="${fill}" ${stroke}/>
+      <path d="M167 161C191 185 224 194 254 182C272 175 285 164 294 151C292 174 280 190 260 201C236 214 211 214 193 203C178 193 170 178 167 161Z" fill="${fill}" opacity=".95"/>
+      <path d="M170 127C195 108 223 103 251 107" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="7" stroke-linecap="round"/>`;
   }
   if (style === 'braids') {
     return `<path d="M145 219C143 139 179 94 231 94C284 94 317 139 314 219C301 197 290 183 278 175C265 196 247 205 228 205C209 205 192 196 181 175C167 185 154 199 145 219Z" fill="${fill}" ${stroke}/>
@@ -164,11 +202,12 @@ function bodyGroup(character, id, isPlayer) {
   const accent = paint(character, 'accent', '#a8445e');
   const ink = '#4a2b34';
   const body = character.body || 'soft';
-  const wide = body === 'curvy' ? 9 : body === 'soft' ? 4 : 0;
+  const shoulder = body === 'curvy' ? 7 : body === 'athletic' ? 8 : body === 'soft' ? 4 : -2;
+  const waist = body === 'curvy' ? 10 : body === 'athletic' ? 0 : body === 'soft' ? 4 : -3;
   const armLeft = `M169 376 C148 392 137 430 139 477 C140 512 145 541 158 557 C163 564 176 562 178 553 C169 512 173 447 191 398Z`;
   const armRight = `M291 376 C312 392 323 430 321 477 C320 512 315 541 302 557 C297 564 284 562 282 553 C291 512 287 447 269 398Z`;
-  const torso = `M${164 - wide} 367 Q190 344 230 344 Q${270 + wide} 344 ${296 + wide} 367 L${298 + wide} 431 Q${294 + wide} 472 ${278 + wide} 501 L${182 - wide} 501 Q${166 - wide} 472 ${162 - wide} 431Z`;
-  const skirt = `M${182 - wide} 497 L${150 - wide * 1.4} 610 Q147 634 177 638 L283 638 Q313 634 ${310 + wide * 1.4} 610 L${278 + wide} 497Z`;
+  const torso = `M${164 - shoulder} 367 Q190 344 230 344 Q${270 + shoulder} 344 ${296 + shoulder} 367 L${298 + waist} 431 Q${294 + waist} 472 ${278 + waist} 501 L${182 - waist} 501 Q${166 - waist} 472 ${162 - waist} 431Z`;
+  const skirt = `M${182 - waist} 497 L${150 - waist * 1.3} 610 Q147 634 177 638 L283 638 Q313 634 ${310 + waist * 1.3} 610 L${278 + waist} 497Z`;
 
   let outfitDetails = '';
   if (character.outfitStyle === 'apron') {
@@ -223,13 +262,45 @@ function bodyGroup(character, id, isPlayer) {
       <g fill="${outfit2}" opacity=".8">
         <circle cx="146" cy="465" r="4"/><circle cx="314" cy="465" r="4"/>
       </g>`;
+  } else if (character.outfitStyle === 'hoodie') {
+    outfitDetails = `
+      <path d="M186 358 Q191 326 230 326 Q269 326 274 358 Q253 341 230 341 Q207 341 186 358Z" fill="${outfit2}" opacity=".9"/>
+      <path d="M195 363 Q230 392 265 363 L278 500 L182 500Z" fill="${outfit2}" opacity=".38"/>
+      <path d="M230 382 V500" stroke="${accent}" stroke-width="1.7" opacity=".4"/>
+      <path d="M212 380 V424M248 380 V424" stroke="${accent}" stroke-width="2" stroke-linecap="round" opacity=".75"/>
+      <circle cx="212" cy="428" r="3.2" fill="${accent}"/><circle cx="248" cy="428" r="3.2" fill="${accent}"/>
+      <path d="M196 446 H264 Q270 480 264 497 H196 Q190 480 196 446Z" fill="${outfit2}" opacity=".72"/>
+      <path d="M197 447 H263" stroke="${accent}" stroke-width="1.4" opacity=".3"/>
+      <path d="M158 552 Q170 559 179 550M302 552 Q290 559 281 550" fill="none" stroke="${outfit2}" stroke-width="5" stroke-linecap="round" opacity=".8"/>`;
+  } else if (character.outfitStyle === 'formal') {
+    outfitDetails = `
+      <path d="M194 359 L230 384 L266 359 L278 500 L182 500Z" fill="${outfit2}" opacity=".9"/>
+      <path d="M205 357 L230 381 L220 341 L210 337Z" fill="${outfit2}" opacity=".98"/>
+      <path d="M255 357 L230 381 L240 341 L250 337Z" fill="${outfit2}" opacity=".98"/>
+      <path d="M230 381 L245 366 L250 386 L230 497 L210 386 L215 366Z" fill="${accent}" opacity=".82"/>
+      <path d="M230 390 V494" stroke="#fff" stroke-opacity=".25" stroke-width="1.2"/>
+      <g fill="${accent}" opacity=".7"><circle cx="230" cy="414" r="2.1"/><circle cx="230" cy="442" r="2.1"/><circle cx="230" cy="470" r="2.1"/></g>
+      <path d="M192 407 H210 V424 H192Z" fill="none" stroke="${accent}" stroke-width="1.2" opacity=".35"/>
+      <path d="M198 361 L230 384 L262 361" fill="none" stroke="${accent}" stroke-width="1.6" opacity=".45"/>`;
+  } else if (character.outfitStyle === 'sporty') {
+    outfitDetails = `
+      <path d="M190 357 L230 379 L270 357 L278 500 L182 500Z" fill="${outfit2}" opacity=".55"/>
+      <path d="M230 379 V500" stroke="${outfit2}" stroke-width="2.4" opacity=".9"/>
+      <path d="M230 379 V500" stroke="${accent}" stroke-width="1" stroke-dasharray="3 3" opacity=".8"/>
+      <path d="M192 366 L208 375 L199 401 L184 390Z" fill="${accent}" opacity=".8"/>
+      <path d="M268 366 L252 375 L261 401 L276 390Z" fill="${accent}" opacity=".8"/>
+      <path d="M164 388 L180 396 M296 388 L280 396" stroke="${outfit2}" stroke-width="4" opacity=".75"/>
+      <path d="M212 364 Q230 353 248 364" fill="none" stroke="${outfit2}" stroke-width="3.4"/>
+      <path d="M242 430 h13 v13 h-13Z" fill="none" stroke="${outfit2}" stroke-width="1.8" opacity=".8"/>
+      <path d="M196 483 H264" stroke="${outfit2}" stroke-width="5" opacity=".6"/>`;
   } else if (isPlayer) {
     outfitDetails = `
       <path d="M190 357 L230 380 L270 357 L282 500 L178 500Z" fill="${outfit2}" opacity=".92"/>
       <path d="M230 380 L230 500" stroke="${accent}" stroke-width="1.5" opacity=".35"/>
       <path d="M184 363 L204 373 L194 407 L176 394Z" fill="${accent}" opacity=".72"/>
       <path d="M276 363 L256 373 L266 407 L284 394Z" fill="${accent}" opacity=".72"/>
-      <path d="M205 368 L230 381 L255 368" fill="none" stroke="${accent}" stroke-width="2"/>`;
+      <path d="M205 368 L230 381 L255 368" fill="none" stroke="${accent}" stroke-width="2"/>
+      <path d="M212 420 Q230 430 248 420" fill="none" stroke="${accent}" stroke-width="1.6" opacity=".4"/>`;
   }
 
   const legs = isPlayer ? '' : `
@@ -237,12 +308,13 @@ function bodyGroup(character, id, isPlayer) {
     <path d="M265 605 C270 636 273 661 276 684 L250 684 C248 657 243 632 238 606Z" fill="${skin}" stroke="${skinShade}" stroke-width="1.5"/>
     <path d="M181 676 Q195 671 212 676 L214 692 Q196 698 179 691Z" fill="${accent}" stroke="${accent}" stroke-width="1.4"/>
     <path d="M279 676 Q265 671 248 676 L246 692 Q264 698 281 691Z" fill="${accent}" stroke="${accent}" stroke-width="1.4"/>`;
+  const pant = Math.max(-2, Math.min(7, waist));
   const lower = isPlayer
-    ? `<path d="M178 497 L158 692 L216 692 L230 542 L244 692 L302 692 L282 497Z" fill="#46404f" stroke="#332e3b" stroke-width="2"/>
-       <path d="M178 506 H282" stroke="#332e3b" stroke-width="3" opacity=".6"/>`
+    ? `<path d="M${178 - pant} 497 L${158 - pant} 692 L${216 - pant} 692 L230 542 L${244 + pant} 692 L${302 + pant} 692 L${282 + pant} 497Z" fill="#46404f" stroke="#332e3b" stroke-width="2"/>
+       <path d="M${178 - pant} 506 H${282 + pant}" stroke="#332e3b" stroke-width="3" opacity=".6"/>`
     : `<path d="${skirt}" fill="${outfit}" stroke="${accent}" stroke-opacity=".3" stroke-width="2"/>
-       <path d="M${180 - wide} 500 Q230 516 ${280 + wide} 500" fill="none" stroke="${accent}" stroke-width="2.5" opacity=".35"/>
-       <path d="M${188 - wide} 512 C190 550 188 595 180 632" fill="none" stroke="#fff" stroke-opacity=".17" stroke-width="6" stroke-linecap="round"/>`;
+       <path d="M${180 - waist} 500 Q230 516 ${280 + waist} 500" fill="none" stroke="${accent}" stroke-width="2.5" opacity=".35"/>
+       <path d="M${188 - waist} 512 C190 550 188 595 180 632" fill="none" stroke="#fff" stroke-opacity=".17" stroke-width="6" stroke-linecap="round"/>`;
 
   return `
     <g>
@@ -253,7 +325,7 @@ function bodyGroup(character, id, isPlayer) {
       <ellipse cx="292" cy="560" rx="12" ry="15" fill="${skin}" stroke="${skinShade}" stroke-width="1.4" transform="rotate(9 292 560)"/>
       ${lower}
       <path d="${torso}" fill="${outfit}" stroke="${accent}" stroke-opacity=".28" stroke-width="2"/>
-      <path d="M${171 - wide} 392 C190 420 270 420 ${289 + wide} 392" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="8"/>
+      <path d="M${171 - shoulder} 392 C190 420 270 420 ${289 + shoulder} 392" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="8"/>
       ${outfitDetails}
       <path d="M205 323 H255 V358 Q243 372 230 372 Q217 372 205 358Z" fill="${skin}" stroke="${skinShade}" stroke-width="1.4"/>
       <path d="M205 342 Q230 358 255 342" fill="${skinShade}" opacity=".25"/>
@@ -281,6 +353,24 @@ function accessoryGroup(character) {
   if (accessory === 'scarf') {
     return `<path d="M203 338 Q230 366 257 338 L266 352 Q243 376 230 376 Q217 376 194 352Z" fill="${accent}" opacity=".88"/>
       <path d="M216 358 L202 394 L220 389 L230 372Z" fill="${accent}" opacity=".75"/>`;
+  }
+  if (accessory === 'headphones') {
+    return `<g fill="none" stroke="${ink}" stroke-width="4.2" stroke-linecap="round" opacity=".9">
+      <path d="M153 219C154 149 184 116 230 116C276 116 306 149 307 219"/>
+    </g>
+    <rect x="139" y="216" width="27" height="50" rx="13" fill="${accent}" stroke="${ink}" stroke-opacity=".55" stroke-width="2"/>
+    <rect x="294" y="216" width="27" height="50" rx="13" fill="${accent}" stroke="${ink}" stroke-opacity=".55" stroke-width="2"/>
+    <rect x="146" y="227" width="13" height="28" rx="6.5" fill="${ink}" opacity=".2"/>
+    <rect x="301" y="227" width="13" height="28" rx="6.5" fill="${ink}" opacity=".2"/>`;
+  }
+  if (accessory === 'ribbon') {
+    return `<g transform="translate(292 156) rotate(-18)">
+      <path d="M0 0C-13-14-33-12-34 1c-1 13 18 17 34 4Z" fill="${accent}" stroke="#fff" stroke-opacity=".25" stroke-width="1.4"/>
+      <path d="M0 0C13-14 33-12 34 1c1 13-18 17-34 4Z" fill="${accent}" stroke="#fff" stroke-opacity=".25" stroke-width="1.4"/>
+      <path d="M-6 5c-2 12-6 21-13 29 8-2 14-3 20-2-4-9-6-18-7-27Z" fill="${accent}" opacity=".85"/>
+      <path d="M6 5c2 12 6 21 13 29-8-2-14-3-20-2 4-9 6-18 7-27Z" fill="${accent}" opacity=".85"/>
+      <circle cx="0" cy="3" r="5.2" fill="#fff" opacity=".55"/>
+    </g>`;
   }
   return '';
 }
@@ -373,7 +463,7 @@ export function renderPlayerPortrait(player, options = {}) {
     accent: outfit.dark,
     accessory: player.accessory || 'none',
     body: player.body || 'soft',
-    outfitStyle: 'player',
+    outfitStyle: player.outfitStyle || 'tee',
   };
   return renderPortrait(character, { ...options, isPlayer: true });
 }
@@ -396,8 +486,8 @@ export function renderChildPortrait(child, stage, options = {}) {
       outfit2: '#fff8ef',
       accent,
       accessory: 'none',
-      body: 'slim',
-      outfitStyle: 'player',
+      body: child.body || 'slim',
+      outfitStyle: child.outfitStyle || 'formal',
     }, { mode: options.mode || 'bust', isPlayer: true });
   }
   const isBaby = stageIndex === 0;

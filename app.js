@@ -1,17 +1,28 @@
 import {
   ACCESSORIES,
+  BODY_TYPES,
   CHARACTERS,
   CHILD_NAMES,
+  DATE_COST,
   EYE_COLORS,
   GIFTS,
   HAIR_COLORS,
   HAIR_STYLES,
   LOCATIONS,
+  LOCATION_MAP,
+  MAKEOVER_COST,
+  OFFSPRING_COST,
   OUTFIT_COLORS,
+  OUTFIT_STYLES,
+  PERKS,
+  PERK_POINTS_START,
+  PROPOSAL_COST,
   REL_STAGES,
   SKIN_TONES,
   STAGE_COSTS,
   STAGES,
+  STARTING_FUNDS,
+  WEDDING_COST,
   characterById,
 } from './assets/data.js';
 import {
@@ -25,7 +36,7 @@ import {
 
 const SAVE_KEY = 'hanami-hearts-save-v1';
 const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const GOALS = { marriages: 6, grown: 3, earned: 5000 };
+const GOALS = { marriages: 6, grown: 3, earned: 25000 };
 const PHASES = ['Morning', 'Afternoon', 'Evening'];
 
 const game = {
@@ -41,8 +52,12 @@ const game = {
       hairColorId: 'chestnut',
       eyeId: 'violet',
       outfitId: 'rose',
+      outfitStyleId: 'tee',
+      bodyId: 'soft',
       accessory: 'earrings',
+      perks: [],
     },
+    makeover: false,
     modal: null,
   },
 };
@@ -84,6 +99,70 @@ function getPronouns(player) {
     he: { subject: 'he', object: 'him', possessive: 'his', label: 'he / him' },
   };
   return map[player?.pronoun] || map.she;
+}
+
+function money(value) {
+  return `$${Math.round(value).toLocaleString()}`;
+}
+
+function hasPerk(id) {
+  return Boolean(game.data?.perks?.includes(id));
+}
+
+function giftPrice(gift) {
+  return Math.round(gift.cost * (hasPerk('bargain-heart') ? 0.8 : 1));
+}
+
+function datePrice() {
+  return Math.round(DATE_COST * (hasPerk('bargain-heart') ? 0.8 : 1));
+}
+
+function offspringPrice() {
+  return Math.round(OFFSPRING_COST * (hasPerk('fruitful-home') ? 0.6 : 1));
+}
+
+function raisePrice(stage) {
+  return Math.round((STAGE_COSTS[stage] || 0) * (hasPerk('fruitful-home') ? 0.6 : 1));
+}
+
+function affectionGain(amount) {
+  return Math.round(amount * (hasPerk('silver-tongue') ? 1.25 : 1));
+}
+
+function mixHex(first, second, ratio = 0.5) {
+  const parse = (value) => {
+    const hex = String(value || '#000000').replace('#', '');
+    const full = hex.length === 3 ? hex.split('').map((part) => part + part).join('') : hex;
+    return [0, 2, 4].map((index) => parseInt(full.slice(index, index + 2), 16));
+  };
+  const a = parse(first);
+  const b = parse(second);
+  return `#${a.map((channel, index) => Math.round(channel * (1 - ratio) + b[index] * ratio).toString(16).padStart(2, '0')).join('')}`;
+}
+
+function mixOffspringLooks(mother) {
+  const father = game.data.player;
+  const skin = {
+    color: mixHex(mother.skin.color, father.skin.color, Math.random()),
+    shade: mixHex(mother.skin.shade, father.skin.shade, Math.random()),
+  };
+  const hair = {
+    color: mixHex(mother.hair.color, father.hairColor.color, Math.random()),
+    shade: mixHex(mother.hair.shade, father.hairColor.shade, Math.random()),
+  };
+  const outfitSource = Math.random() < 0.5
+    ? { color: mother.outfit, dark: mother.accent }
+    : { color: father.outfitColor.color, dark: father.outfitColor.dark };
+  return {
+    skin,
+    hair,
+    hairStyle: pick([mother.hairStyle, father.hairStyle, 'wavy']),
+    eye: Math.random() < 0.5 ? mother.eye : father.eyeColor,
+    outfit: outfitSource.color,
+    accent: outfitSource.dark,
+    body: Math.random() < 0.5 ? mother.body : father.body,
+    outfitStyle: Math.random() < 0.5 ? 'formal' : father.outfitStyle,
+  };
 }
 
 function phaseFor(actions) {
@@ -130,11 +209,14 @@ function getWorkingChildren() {
 function incomeBreakdown() {
   const spouses = getSpouses().length;
   const workers = getWorkingChildren().length;
+  const base = 80 + (hasPerk('trust-fund') ? 70 : 0);
+  const spouse = spouses * 120;
+  const child = Math.round(workers * 220 * (hasPerk('family-fortune') ? 1.5 : 1));
   return {
-    base: 10,
-    spouse: spouses * 20,
-    child: workers * 45,
-    total: 10 + spouses * 20 + workers * 45,
+    base,
+    spouse,
+    child,
+    total: base + spouse + child,
     spouses,
     workers,
   };
@@ -148,6 +230,7 @@ function setScreen(name) {
   $('#screen-title').hidden = name !== 'title';
   $('#screen-creator').hidden = name !== 'creator';
   $('#screen-game').hidden = name !== 'game';
+  updateScrollRail();
 }
 
 function stopPetals() {
@@ -247,9 +330,13 @@ function normalizeSave(data) {
   data.player = data.player || {};
   data.player.name = data.player.name || 'Haru';
   data.player.pronoun = ['she', 'he'].includes(data.player.pronoun) ? data.player.pronoun : 'she';
-  data.energy = Number.isFinite(data.energy) ? data.energy : 100;
-  data.maxEnergy = 100;
-  data.coins = Number.isFinite(data.coins) ? data.coins : 180;
+  data.player.body = data.player.body || 'soft';
+  data.player.outfitStyle = data.player.outfitStyle || 'tee';
+  data.perks = Array.isArray(data.perks) ? data.perks.filter((id) => PERKS.some((perk) => perk.id === id)) : [];
+  data.perkPoints = Number.isFinite(data.perkPoints) ? data.perkPoints : Math.max(0, totalMarriagesForData(data) - data.perks.length);
+  data.maxEnergy = 100 + (data.perks.includes('star-power') ? 20 : 0);
+  data.energy = Number.isFinite(data.energy) ? Math.min(data.energy, data.maxEnergy) : data.maxEnergy;
+  data.coins = Number.isFinite(data.coins) ? data.coins : STARTING_FUNDS;
   data.day = Number.isFinite(data.day) ? data.day : 1;
   data.actionsToday = Number.isFinite(data.actionsToday) ? data.actionsToday : 0;
   data.rels = data.rels || {};
@@ -295,7 +382,10 @@ function totalMarriagesForData(data) {
 }
 
 /* --------------------------------------------------------------- State setup */
-function createInitialState(player) {
+function createInitialState(player, perks = []) {
+  const selectedPerks = perks.filter((id) => PERKS.some((perk) => perk.id === id));
+  const maxEnergy = 100 + (selectedPerks.includes('star-power') ? 20 : 0);
+  const startingFunds = STARTING_FUNDS + (selectedPerks.includes('trust-fund') ? 5000 : 0);
   const rels = {};
   CHARACTERS.forEach((character) => {
     rels[character.id] = {
@@ -313,9 +403,11 @@ function createInitialState(player) {
     day: 1,
     phaseActions: 0,
     actionsToday: 0,
-    energy: 100,
-    maxEnergy: 100,
-    coins: 180,
+    energy: maxEnergy,
+    maxEnergy,
+    coins: startingFunds,
+    perks: selectedPerks,
+    perkPoints: Math.max(0, PERK_POINTS_START - selectedPerks.length),
     rels,
     children: [],
     log: [],
@@ -340,7 +432,8 @@ function playerFromCreator() {
     eyeColor: findById(EYE_COLORS, creator.eyeId).color,
     outfitColor: findById(OUTFIT_COLORS, creator.outfitId),
     accessory: creator.accessory,
-    body: 'soft',
+    body: creator.bodyId || 'soft',
+    outfitStyle: creator.outfitStyleId || 'tee',
   };
 }
 
@@ -353,6 +446,18 @@ function renderTitle() {
 /* ------------------------------------------------------------ Creator setup */
 function renderCreator() {
   const creator = game.ui.creator;
+  const perkSlots = PERK_POINTS_START;
+  if (game.ui.makeover) {
+    const back = $('#creator-back-button');
+    const start = $('#start-story-button span');
+    if (back) back.textContent = '← Back to your story';
+    if (start) start.textContent = `Save new look · ${money(MAKEOVER_COST)}`;
+  } else {
+    const back = $('#creator-back-button');
+    const start = $('#start-story-button span');
+    if (back) back.textContent = '← Back to title';
+    if (start) start.textContent = 'Move to Hanami Hollow';
+  }
   $('#creator-form').innerHTML = `
     <div class="creator-form">
       <div class="form-split">
@@ -377,7 +482,15 @@ function renderCreator() {
         </div>
       </div>
       <div class="form-block">
-        <div class="form-label">Hair style</div>
+        <div class="form-label">Body type <small>your silhouette</small></div>
+        <div class="hair-style-grid body-style-grid">
+          ${BODY_TYPES.map((body) => `
+            <button class="style-chip ${creator.bodyId === body.id ? 'selected' : ''}" data-action="creator-body" data-id="${body.id}">${body.label}</button>
+          `).join('')}
+        </div>
+      </div>
+      <div class="form-block">
+        <div class="form-label">Hair style <small>ten ways to wear it</small></div>
         <div class="hair-style-grid">
           ${HAIR_STYLES.map((style) => `
             <button class="style-chip ${creator.hairStyle === style.id ? 'selected' : ''}" data-action="creator-hair-style" data-id="${style.id}">${style.label}</button>
@@ -411,6 +524,14 @@ function renderCreator() {
         </div>
       </div>
       <div class="form-block">
+        <div class="form-label">Outfit style</div>
+        <div class="hair-style-grid outfit-style-grid">
+          ${OUTFIT_STYLES.map((style) => `
+            <button class="style-chip ${creator.outfitStyleId === style.id ? 'selected' : ''}" data-action="creator-outfit-style" data-id="${style.id}">${style.label}</button>
+          `).join('')}
+        </div>
+      </div>
+      <div class="form-block">
         <div class="form-label">A little detail</div>
         <div class="accessory-grid">
           ${ACCESSORIES.map((accessory) => `
@@ -418,6 +539,23 @@ function renderCreator() {
           `).join('')}
         </div>
       </div>
+      ${game.ui.makeover ? '' : `
+        <div class="form-block perk-block">
+          <div class="form-label">Perks <small>${perkSlots} points · choose up to ${perkSlots}</small></div>
+          <div class="perk-grid">
+            ${PERKS.map((perk) => {
+              const selected = creator.perks.includes(perk.id);
+              const full = creator.perks.length >= perkSlots;
+              return `<button class="perk-choice ${selected ? 'selected' : ''}" data-action="creator-perk" data-id="${perk.id}" ${!selected && full ? 'disabled' : ''}>
+                <span class="perk-icon">${icon(perk.icon)}</span>
+                <span><b>${perk.name}</b><small>${perk.desc}</small></span>
+                <em>${perk.tag}</em>
+              </button>`;
+            }).join('')}
+          </div>
+          <p class="perk-note">Earn another perk point each time you marry. Spend points anytime from the menu.</p>
+        </div>
+      `}
     </div>
   `;
   updateCreatorPreview();
@@ -432,7 +570,7 @@ function updateCreatorPreview() {
   if (namePreview) namePreview.textContent = previewName;
   const summary = $('#creator-summary');
   if (summary) {
-    summary.innerHTML = `<b>${escapeHtml(previewName)}</b> · ${getPronouns(player).label}<br />${HAIR_STYLES.find((style) => style.id === player.hairStyle)?.label || 'Soft waves'} · ${ACCESSORIES.find((item) => item.id === player.accessory)?.label || 'No accessory'}`;
+    summary.innerHTML = `<b>${escapeHtml(previewName)}</b> · ${getPronouns(player).label}<br />${BODY_TYPES.find((body) => body.id === player.body)?.label || 'Soft'} · ${HAIR_STYLES.find((style) => style.id === player.hairStyle)?.label || 'Soft waves'} · ${OUTFIT_STYLES.find((style) => style.id === player.outfitStyle)?.label || 'T-shirt'}`;
   }
   $$('[data-action="creator-skin"]').forEach((button) => button.classList.toggle('selected', button.dataset.id === game.ui.creator.skinId));
   $$('[data-action="creator-hair-color"]').forEach((button) => button.classList.toggle('selected', button.dataset.id === game.ui.creator.hairColorId));
@@ -440,6 +578,8 @@ function updateCreatorPreview() {
   $$('[data-action="creator-outfit"]').forEach((button) => button.classList.toggle('selected', button.dataset.id === game.ui.creator.outfitId));
   $$('[data-action="creator-hair-style"]').forEach((button) => button.classList.toggle('selected', button.dataset.id === game.ui.creator.hairStyle));
   $$('[data-action="creator-accessory"]').forEach((button) => button.classList.toggle('selected', button.dataset.id === game.ui.creator.accessory));
+  $$('[data-action="creator-body"]').forEach((button) => button.classList.toggle('selected', button.dataset.id === game.ui.creator.bodyId));
+  $$('[data-action="creator-outfit-style"]').forEach((button) => button.classList.toggle('selected', button.dataset.id === game.ui.creator.outfitStyleId));
 }
 
 function beginNewStory() {
@@ -450,11 +590,107 @@ function beginNewStory() {
     return;
   }
   const player = playerFromCreator();
-  game.data = createInitialState(player);
+  game.data = createInitialState(player, game.ui.creator.perks);
   game.ui.view = 'town';
   game.ui.soundOn = true;
   saveGame();
   enterGame();
+  showToast(`Your new life starts with ${money(game.data.coins)} in the bank.`, 'coin');
+}
+
+function startMakeover() {
+  if (!game.data) return;
+  if (game.data.coins < MAKEOVER_COST) {
+    showToast(`A full makeover costs ${money(MAKEOVER_COST)}.`, 'coin');
+    return;
+  }
+  const player = game.data.player;
+  game.ui.creator = {
+    name: player.name,
+    pronoun: player.pronoun,
+    skinId: player.skin?.id || 'peach',
+    hairStyle: player.hairStyle || 'wavy',
+    hairColorId: player.hairColor?.id || 'chestnut',
+    eyeId: EYE_COLORS.find((color) => color.color === player.eyeColor)?.id || 'violet',
+    outfitId: player.outfitColor?.id || 'rose',
+    outfitStyleId: player.outfitStyle || 'tee',
+    bodyId: player.body || 'soft',
+    accessory: player.accessory || 'none',
+    perks: [],
+  };
+  game.ui.makeover = true;
+  closeModal();
+  setScreen('creator');
+  renderCreator();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function saveMakeover() {
+  const name = game.ui.creator.name.trim();
+  if (!name) {
+    showToast('Give your character a name first.', 'sparkle');
+    return;
+  }
+  if (game.data.coins < MAKEOVER_COST) {
+    showToast(`A full makeover costs ${money(MAKEOVER_COST)}.`, 'coin');
+    return;
+  }
+  game.data.coins -= MAKEOVER_COST;
+  game.data.player = { ...game.data.player, ...playerFromCreator() };
+  addLog(`Visited the salon and came out with a whole new look (${money(MAKEOVER_COST)}).`, 'sparkle');
+  game.ui.makeover = false;
+  saveGame();
+  enterGame();
+  showToast('New look, same story.', 'sparkle');
+}
+
+function buyPerk(id) {
+  const perk = PERKS.find((entry) => entry.id === id);
+  if (!perk || game.data.perks.includes(id)) return;
+  if ((game.data.perkPoints || 0) < 1) {
+    showToast('No perk points available. Marry someone to earn another.', 'star');
+    return;
+  }
+  game.data.perkPoints -= 1;
+  game.data.perks.push(id);
+  if (id === 'trust-fund') game.data.coins += 5000;
+  if (id === 'star-power') {
+    game.data.maxEnergy += 20;
+    game.data.energy = Math.min(game.data.maxEnergy, game.data.energy + 20);
+  }
+  addLog(`Unlocked the ${perk.name} perk.`, 'star');
+  saveGame();
+  renderAll();
+  renderModal();
+  playSound('ceremony');
+  showToast(`${perk.name} unlocked.`, 'star');
+}
+
+function updateScrollRail() {
+  const rail = $('#scroll-rail');
+  if (!rail) return;
+  const active = !$('#screen-creator')?.hidden || !$('#screen-game')?.hidden;
+  rail.classList.toggle('visible', active);
+}
+
+function scrollActivePanel(direction) {
+  const amount = Math.max(260, window.innerHeight * 0.7) * direction;
+  const modal = $('#modal-root .modal-panel');
+  if (modal) {
+    const scrollable = [modal, ...modal.querySelectorAll('*')].find((element) => {
+      if (element.scrollHeight <= element.clientHeight + 4) return false;
+      const overflow = getComputedStyle(element).overflowY;
+      return overflow === 'auto' || overflow === 'scroll';
+    });
+    if (scrollable) scrollable.scrollBy({ top: amount, behavior: 'smooth' });
+    return;
+  }
+  const creatorPanel = $('.creator-form-panel');
+  if (creatorPanel && creatorPanel.scrollHeight > creatorPanel.clientHeight + 4 && getComputedStyle(creatorPanel).overflowY === 'auto') {
+    creatorPanel.scrollBy({ top: amount, behavior: 'smooth' });
+    return;
+  }
+  window.scrollBy({ top: amount, behavior: 'smooth' });
 }
 
 function enterGame() {
@@ -492,7 +728,7 @@ function renderRail() {
       </div>
     </div>
     <div class="rail-player-stats">
-      <span class="rail-stat">${icon('coin')}<b>${game.data.coins}</b> coins</span>
+      <span class="rail-stat">${icon('coin')}<b>${money(game.data.coins)}</b> funds</span>
       <span class="rail-stat">${icon('heart')}<b>${spouses.length}/6</b> hearts</span>
     </div>
   `;
@@ -516,13 +752,13 @@ function renderTopbar() {
     town: { kicker: `Hanami Hollow · Day ${game.data.day} · ${phase}`, title: 'A warm welcome' },
     hearts: { kicker: `Hearts · ${hearts} of 6 marriages`, title: 'Six stories, one heart' },
     home: { kicker: `Home · ${plural(game.data.children.length, 'offspring', 'offspring')}`, title: 'The life you are building' },
-    ledger: { kicker: `Ledger · ${game.data.totalEarned} coins earned`, title: 'Your story so far' },
+    ledger: { kicker: `Ledger · ${money(game.data.totalEarned)} earned`, title: 'Your story so far' },
   };
   const copy = viewCopy[game.ui.view] || viewCopy.town;
   $('#top-kicker').textContent = copy.kicker;
   $('#top-title').textContent = copy.title;
   $('#resource-bar').innerHTML = `
-    <span class="resource-pill gold">${icon('coin')}<span class="resource-label">Coins</span><b>${game.data.coins}</b></span>
+    <span class="resource-pill gold">${icon('coin')}<span class="resource-label">Funds</span><b>${money(game.data.coins)}</b></span>
     <span class="resource-pill energy">${icon('energy')}<span class="resource-label">Energy</span><b>${game.data.energy}</b><span class="energy-track"><i style="width:${(game.data.energy / game.data.maxEnergy) * 100}%"></i></span></span>
     <span class="resource-pill">${icon('heart')}<span class="resource-label">Hearts</span><b>${hearts}/6</b></span>
     <span class="resource-pill">${icon('sparkle')}<span class="resource-label">Household</span><b>${game.data.children.length}</b></span>
@@ -555,7 +791,7 @@ function townView() {
         <h3>${greeting}, <em>${escapeHtml(data.player.name)}</em>.<br />The town is blooming.</h3>
         <p>Six women, six very different stories. Follow your heart, build a home, and let the family grow — one small, brave choice at a time.</p>
         <div class="hero-actions">
-          <button class="hero-button" data-action="work-shift">${icon('work')} Work a shift <span>+coins</span></button>
+          <button class="hero-button" data-action="work-shift">${icon('work')} Work a shift <span>+funds</span></button>
           <button class="hero-button subtle" data-action="go-view" data-view="home">${icon('home')} Go home</button>
           <button class="hero-button subtle" data-action="end-day">${icon('moon')} End day</button>
         </div>
@@ -568,9 +804,35 @@ function townView() {
         <div class="hero-mini-stats">
           <span><b>${spouses.length}/6</b>hearts won</span>
           <span><b>${data.children.length}</b>offspring</span>
-          <span><b>+${daily.total}</b>daily income</span>
+          <span><b>+${money(daily.total)}</b>daily income</span>
         </div>
       </aside>
+    </section>
+
+    <section class="town-map-panel">
+      <div class="section-heading">
+        <div><p class="eyebrow"><span></span> The town map</p><h3>Pick a place, <em>pick a heart</em></h3><p>Six stops, six stories. Tap a pin to walk into someone's day.</p></div>
+        <span class="map-legend">${icon('pin')} Tap a location to visit</span>
+      </div>
+      <div class="town-map">
+        <svg class="map-roads" viewBox="0 0 100 78" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M4 68C20 54 24 48 34 58S57 70 63 67 76 52 96 82" fill="none" stroke="#c9b6a7" stroke-width="2.2" stroke-dasharray="0.8 3" opacity=".55"/>
+          <path d="M10 20C26 25 36 16 48 18S70 28 84 30 94 44 96 52" fill="none" stroke="#bcd2c1" stroke-width="7" opacity=".4"/>
+          <path d="M20 26 34 58M48 18 63 67M75 30 63 67M75 30 85 80M20 26 48 18" fill="none" stroke="#c9b6a7" stroke-width="1.5" stroke-dasharray="1 3" opacity=".42"/>
+          <g fill="#a9c5a4" opacity=".45">
+            <circle cx="12" cy="42" r="3"/><circle cx="90" cy="18" r="2.4"/><circle cx="58" cy="45" r="2.2"/>
+            <circle cx="27" cy="76" r="2.4"/><circle cx="92" cy="66" r="2.8"/>
+          </g>
+        </svg>
+        ${Object.entries(LOCATIONS).map(([key, location]) => {
+          const character = characterById(location.char);
+          const point = LOCATION_MAP[key];
+          return `<button class="map-node" data-action="open-character" data-char="${character.id}" style="--x:${point.x}%;--y:${point.y}%;--loc-a:${location.colors[0]};--loc-b:${location.colors[1]}" aria-label="Visit ${escapeHtml(character.name)} at ${escapeHtml(location.name)}">
+            <span class="map-pin">${icon('pin')}</span>
+            <span class="map-node-label"><b>${escapeHtml(character.name)}</b><small>${escapeHtml(location.short)}</small></span>
+          </button>`;
+        }).join('')}
+      </div>
     </section>
 
     <div class="town-layout">
@@ -603,7 +865,7 @@ function townView() {
           <p>${phase === 'Evening' ? 'The light is gold. One more conversation, then home.' : 'Small steps make a whole life. Choose what matters.'}</p>
           <div class="today-list">
             <div class="today-row">${icon('energy')} Energy <b>${data.energy}/${data.maxEnergy}</b></div>
-            <div class="today-row">${icon('work')} Shift pay <b>55–85 coins</b></div>
+            <div class="today-row">${icon('work')} Shift pay <b>$280–440</b></div>
             <div class="today-row">${icon('heart')} Open hearts <b>${totalMarriages()}/6</b></div>
           </div>
           <div class="today-actions">
@@ -618,7 +880,7 @@ function townView() {
           <div class="dream-list">
             ${dreamItem('Marry all six women', totalMarriages(), GOALS.marriages)}
             ${dreamItem('Raise grown offspring', getGrownChildren().length, GOALS.grown)}
-            ${dreamItem('Earn a family fortune', game.data.totalEarned, GOALS.earned, 'coins')}
+            ${dreamItem('Earn a family fortune', game.data.totalEarned, GOALS.earned, 'funds')}
           </div>
         </div>
 
@@ -640,7 +902,7 @@ function townView() {
 
 function dreamItem(label, value, goal, type = '') {
   const percent = clamp((value / goal) * 100, 0, 100);
-  const shown = type === 'coins' ? `${value.toLocaleString()} / ${goal.toLocaleString()}` : `${value} / ${goal}`;
+  const shown = type === 'funds' ? `${money(value)} / ${money(goal)}` : `${value} / ${goal}`;
   return `<div class="dream-item"><span>${label}</span><b>${shown}</b><div class="dream-track"><i style="width:${percent}%"></i></div></div>`;
 }
 
@@ -731,11 +993,11 @@ function homeView() {
         <section class="panel">
           <div class="panel-head"><div><h4>Tomorrow's income</h4><p>Paid when you rest for the night.</p></div></div>
           <div class="income-list">
-            <div class="income-row"><span>${icon('home')} Base household</span><b>+${income.base}</b></div>
-            <div class="income-row"><span>${icon('heart')} Partners (${income.spouses})</span><b>+${income.spouse}</b></div>
-            <div class="income-row"><span>${icon('work')} Grown offspring (${income.workers})</span><b>+${income.child}</b></div>
+            <div class="income-row"><span>${icon('home')} Base household</span><b>+${money(income.base)}</b></div>
+            <div class="income-row"><span>${icon('heart')} Partners (${income.spouses})</span><b>+${money(income.spouse)}</b></div>
+            <div class="income-row"><span>${icon('work')} Grown offspring (${income.workers})</span><b>+${money(income.child)}</b></div>
           </div>
-          <div class="income-total"><span>Next morning</span><b>+${income.total}</b></div>
+          <div class="income-total"><span>Next morning</span><b>+${money(income.total)}</b></div>
           <div class="home-action-stack">
             <button class="primary-button" data-action="end-day">Rest &amp; begin next day</button>
             <button class="ghost-button" data-action="go-view" data-view="town">Back to town</button>
@@ -747,9 +1009,9 @@ function homeView() {
           <div class="today-list">
             <div class="today-row">${icon('music')} Evening tea <b>+energy</b></div>
             <div class="today-row">${icon('family')} Family dinner <b>+love</b></div>
-            <div class="today-row">${icon('coin')} Business ledger <b>+${income.total}/day</b></div>
+            <div class="today-row">${icon('coin')} Business ledger <b>+${money(income.total)}/day</b></div>
           </div>
-          <div class="house-note">${icon('sparkle')} <span>Marriage adds a partner's contribution to the household. Grown offspring who join the business add more. Every coin can become a gift, a gesture, a new beginning.</span></div>
+          <div class="house-note">${icon('sparkle')} <span>Marriage adds a partner's contribution to the household. Grown offspring who join the business add more. Every dollar can become a gift, a gesture, a new beginning.</span></div>
         </section>
       </aside>
     </div>
@@ -758,7 +1020,7 @@ function homeView() {
 
 function childView(child) {
   const parent = characterById(child.parentId);
-  const nextCost = STAGE_COSTS[child.stage + 1];
+  const nextCost = raisePrice(child.stage + 1);
   const canRaise = child.stage < 3 && game.data.coins >= nextCost;
   const stageLabel = child.stage === 3 ? (child.working ? 'Grown · family business' : 'Grown · choosing their path') : STAGES[child.stage];
   return `<div class="child-row">
@@ -769,7 +1031,7 @@ function childView(child) {
     </div>
     <div class="child-actions">
       ${child.stage < 3
-        ? `<button class="mini-button" data-action="raise-child" data-child="${child.id}" ${canRaise ? '' : 'disabled'}>${icon('sparkle')} Raise · ${nextCost}</button>`
+        ? `<button class="mini-button" data-action="raise-child" data-child="${child.id}" ${canRaise ? '' : 'disabled'}>${icon('sparkle')} Raise · ${money(nextCost)}</button>`
         : `<button class="mini-button ${child.working ? 'gold' : 'soft'}" data-action="toggle-child-work" data-child="${child.id}">${icon('work')} ${child.working ? 'Working' : 'Join business'}</button>`}
     </div>
   </div>`;
@@ -794,7 +1056,7 @@ function ledgerView() {
       <div class="stat-card">${icon('heart')}<b>${totalMarriages()}</b><span>marriages</span></div>
       <div class="stat-card">${icon('family')}<b>${data.children.length}</b><span>offspring</span></div>
       <div class="stat-card">${icon('work')}<b>${grown}</b><span>grown offspring</span></div>
-      <div class="stat-card">${icon('coin')}<b>${data.totalEarned.toLocaleString()}</b><span>coins earned</span></div>
+      <div class="stat-card">${icon('coin')}<b>${money(data.totalEarned)}</b><span>funds earned</span></div>
     </div>
 
     <div class="ledger-layout">
@@ -835,7 +1097,7 @@ function achievementDefinitions() {
     { id: 'family-business', label: 'The family business', icon: 'work', check: () => getWorkingChildren().length > 0 },
     { id: 'full-house', label: 'A full house', icon: 'home', check: () => totalMarriages() === 6 },
     { id: 'three-grown', label: 'A growing legacy', icon: 'family', check: () => getGrownChildren().length >= 3 },
-    { id: 'fortune', label: 'A family fortune', icon: 'coin', check: () => game.data.totalEarned >= 1000 },
+    { id: 'fortune', label: 'A family fortune', icon: 'coin', check: () => game.data.totalEarned >= 5000 },
     { id: 'legacy', label: 'Happily ever after', icon: 'star', check: () => game.data.completed },
   ];
 }
@@ -851,6 +1113,7 @@ function closeModal() {
   const root = $('#modal-root');
   root.classList.remove('has-modal');
   root.innerHTML = '';
+  updateScrollRail();
 }
 
 function closeButton() {
@@ -884,6 +1147,9 @@ function renderModal() {
   } else if (modal.type === 'rename') {
     content = renameModal();
     root.innerHTML = `<button class="modal-backdrop" data-action="close-modal" aria-label="Close dialog"></button>${modalShell(content, 'modal-panel small', 'Rename character')}`;
+  } else if (modal.type === 'perks') {
+    content = perksModal();
+    root.innerHTML = `<button class="modal-backdrop" data-action="close-modal" aria-label="Close dialog"></button>${modalShell(content, 'modal-panel medium', 'Perks')}`;
   } else if (modal.type === 'summary') {
     content = summaryModal(modal);
     root.innerHTML = `<button class="modal-backdrop" data-action="close-modal" aria-label="Close dialog"></button>${modalShell(content, 'modal-panel small', 'A new day')}`;
@@ -904,6 +1170,7 @@ function renderModal() {
     root.innerHTML = `<button class="modal-backdrop" data-action="close-modal" aria-label="Close dialog"></button>${modalShell(content, 'modal-panel medium', 'A full house')}`;
   }
   root.classList.add('has-modal');
+  updateScrollRail();
   if (modal.type === 'rename') {
     setTimeout(() => $('#rename-input')?.focus(), 60);
   }
@@ -970,16 +1237,16 @@ function actionPane(character, rel) {
   const chatDisabled = game.data.energy < 10;
   const flirtDisabled = game.data.energy < 15 || affection < 20;
   const dateDisabled = game.data.energy < 25 || affection < 30;
-  const proposeDisabled = status !== 'dating' || affection < 80 || game.data.coins < 250 || game.data.energy < 15;
-  const marryDisabled = status !== 'engaged' || game.data.coins < 150;
+  const proposeDisabled = status !== 'dating' || affection < 80 || game.data.coins < PROPOSAL_COST || game.data.energy < 15;
+  const marryDisabled = status !== 'engaged' || game.data.coins < WEDDING_COST;
   return `
     <div class="action-grid">
       ${actionButton('interact', character.id, 'heart', 'Chat', chatDisabled ? 'Not enough energy' : '10 energy · +7 affection', '', chatDisabled, 'chat')}
       ${actionButton('interact', character.id, 'sparkle', 'Flirt', flirtDisabled ? (affection < 20 ? 'Reach 20% affection' : 'Not enough energy') : '15 energy · +10 affection', 'romantic', flirtDisabled, 'flirt')}
-      ${actionButton('gift-mode', character.id, 'gift', 'Give a gift', 'Coins · up to +22 affection', '', false, '')}
-      ${actionButton('date-mode', character.id, 'moon', 'Ask on a date', dateDisabled ? (affection < 30 ? 'Reach 30% affection' : 'Not enough energy') : '25 energy · a little scene', 'romantic', dateDisabled, '')}
-      ${actionButton('propose', character.id, 'ring', status === 'married' ? 'Already married' : status === 'engaged' ? 'Already engaged' : 'Propose', proposeDisabled ? (status !== 'dating' ? 'Date first, then propose' : affection < 80 ? 'Reach 80% affection' : 'Need 250 coins') : '250 coins · 15 energy', 'gold', proposeDisabled, '')}
-      ${actionButton('marry', character.id, 'family', status === 'married' ? 'Happily married' : 'Wedding', marryDisabled ? (status !== 'engaged' ? 'Accept a proposal first' : 'Need 150 coins') : '150 coins · make it official', 'gold', marryDisabled, '')}
+      ${actionButton('gift-mode', character.id, 'gift', 'Give a gift', 'Funds · up to +22 affection', '', false, '')}
+      ${actionButton('date-mode', character.id, 'moon', 'Ask on a date', dateDisabled ? (affection < 30 ? 'Reach 30% affection' : 'Not enough energy') : `${money(datePrice())} · 25 energy`, 'romantic', dateDisabled, '')}
+      ${actionButton('propose', character.id, 'ring', status === 'married' ? 'Already married' : status === 'engaged' ? 'Already engaged' : 'Propose', proposeDisabled ? (status !== 'dating' ? 'Date first, then propose' : affection < 80 ? 'Reach 80% affection' : `Need ${money(PROPOSAL_COST)}`) : `${money(PROPOSAL_COST)} · 15 energy`, 'gold', proposeDisabled, '')}
+      ${actionButton('marry', character.id, 'family', status === 'married' ? 'Happily married' : 'Wedding', marryDisabled ? (status !== 'engaged' ? 'Accept a proposal first' : `Need ${money(WEDDING_COST)}`) : `${money(WEDDING_COST)} · make it official`, 'gold', marryDisabled, '')}
     </div>
     <div class="action-footer">
       <span>${icon('clock')} Met day <b>${rel.metDay}</b></span>
@@ -1007,12 +1274,13 @@ function giftPane(character, favorite) {
         const isFavorite = character.favoriteGift === gift.id;
         const isLiked = character.likedGifts.includes(gift.id);
         const bonus = isFavorite ? 22 : isLiked ? 14 : 7;
-        const disabled = game.data.coins < gift.cost;
+        const price = giftPrice(gift);
+        const disabled = game.data.coins < price;
         return `<button class="gift-card" data-action="give-gift" data-char="${character.id}" data-gift="${gift.id}" ${disabled ? 'disabled' : ''}>
           <span class="gift-icon" style="${isFavorite ? 'background:#f2d6b2;color:#8d6129' : ''}">${icon(gift.icon)}</span>
           <b>${escapeHtml(gift.name)}</b>
           <span class="gift-bonus">${isFavorite ? 'Favourite · ' : isLiked ? 'Liked · ' : ''}+${bonus} affection</span>
-          <span class="gift-cost">${icon('coin')} ${gift.cost}</span>
+          <span class="gift-cost">${icon('coin')} ${money(price)}</span>
         </button>`;
       }).join('')}
     </div>
@@ -1066,10 +1334,10 @@ function summaryModal(modal) {
       <p>${dayName(game.data.day)} · ${game.data.energy} energy restored</p>
     </div>
     <div class="summary-rows">
-      <div class="summary-row"><span>${icon('home')} Base household</span><b>+${income.base}</b></div>
-      <div class="summary-row"><span>${icon('heart')} Partners at home</span><b>+${income.spouse}</b></div>
-      <div class="summary-row"><span>${icon('work')} Grown offspring in business</span><b>+${income.child}</b></div>
-      <div class="summary-row total"><span>${icon('coin')} Morning income</span><b>+${income.total}</b></div>
+      <div class="summary-row"><span>${icon('home')} Base household</span><b>+${money(income.base)}</b></div>
+      <div class="summary-row"><span>${icon('heart')} Partners at home</span><b>+${money(income.spouse)}</b></div>
+      <div class="summary-row"><span>${icon('work')} Grown offspring in business</span><b>+${money(income.child)}</b></div>
+      <div class="summary-row total"><span>${icon('coin')} Morning income</span><b>+${money(income.total)}</b></div>
     </div>
     <div class="summary-actions"><button class="primary-button" data-action="close-modal">Step into the day</button></div>
   `;
@@ -1078,15 +1346,15 @@ function summaryModal(modal) {
 function familyModal() {
   const spouses = getSpouses();
   return `
-    <div class="modal-head"><h3>Start a family</h3><p>Welcome an offspring into a home built on love, care, and consent. Welcoming an offspring costs 200 coins.</p></div>
+    <div class="modal-head"><h3>Start a family</h3><p>Welcome an offspring into a home built on love, care, and consent. Welcoming an offspring costs ${money(offspringPrice())}.</p></div>
     <div class="modal-body">
       ${spouses.length ? `
         <p>Who would you like to start a family with?</p>
         <div class="menu-list" style="margin-top:13px">
-          ${spouses.map((character) => `<button class="menu-row" data-action="have-child" data-char="${character.id}" ${game.data.coins < 200 ? 'disabled' : ''}>
+          ${spouses.map((character) => `<button class="menu-row" data-action="have-child" data-char="${character.id}" ${game.data.coins < offspringPrice() ? 'disabled' : ''}>
             <span class="child-avatar" style="width:35px;height:35px;flex:0 0 auto">${renderPortrait(character, { mode: 'face' })}</span>
             <span>${escapeHtml(character.name)}<br /><small style="color:var(--ink-faint);font-weight:600">${plural(character.age, 'year')} · ${escapeHtml(character.role)}</small></span>
-            <span class="menu-arrow">${game.data.coins < 200 ? 'Need 200 coins' : '200 coins'}</span>
+            <span class="menu-arrow">${game.data.coins < offspringPrice() ? `Need ${money(offspringPrice())}` : money(offspringPrice())}</span>
           </button>`).join('')}
         </div>
         <div class="house-note" style="margin-top:15px">${icon('check')} <span>Offspring are welcomed as dependents and raised with care. They do not work. When they are grown, they may choose to join the family business.</span></div>
@@ -1124,7 +1392,7 @@ function ceremonyModal(modal) {
           <span style="width:210px;height:180px">${renderPlayerPortrait(game.data.player, { mode: 'bust' })}</span>
           <span style="width:210px;height:180px">${renderPortrait(getSpouses()[0] || CHARACTERS[0], { mode: 'bust' })}</span>
         </div>
-        <p style="margin-top:12px"><b>${game.data.totalEarned.toLocaleString()} coins earned · ${game.data.children.length} offspring · ${totalMarriages()} marriages</b></p>
+        <p style="margin-top:12px"><b>${money(game.data.totalEarned)} earned · ${game.data.children.length} offspring · ${totalMarriages()} marriages</b></p>
         <div class="ceremony-actions">
           <button class="primary-button" data-action="close-modal">Keep living the story</button>
         </div>
@@ -1151,9 +1419,33 @@ function ceremonyModal(modal) {
   `;
 }
 
+function perksModal() {
+  const points = game.data.perkPoints || 0;
+  const owned = game.data.perks || [];
+  return `
+    <div class="modal-head"><h3>Perks</h3><p>${points} point${points === 1 ? '' : 's'} to spend. Every marriage earns another point.</p></div>
+    <div class="modal-body">
+      <div class="perk-shop">
+        ${PERKS.map((perk) => {
+          const active = owned.includes(perk.id);
+          return `<div class="perk-shop-row ${active ? 'owned' : ''}">
+            <span class="perk-icon">${icon(perk.icon)}</span>
+            <span class="perk-shop-copy"><b>${perk.name}</b><small>${perk.desc}</small></span>
+            ${active ? '<em class="perk-owned">Active</em>' : `<button class="mini-button" data-action="buy-perk" data-id="${perk.id}" ${points < 1 ? 'disabled' : ''}>Spend 1 point</button>`}
+          </div>`;
+        }).join('')}
+      </div>
+      <p class="perk-note">Perks are permanent for this story. Choose the ones that match the life you want to build.</p>
+      <div class="modal-actions"><button class="primary-button" data-action="close-modal">Back to the story</button></div>
+    </div>
+  `;
+}
+
 function menuModal() {
   const player = game.data.player;
   const soundLabel = game.ui.soundOn ? 'Sound is on' : 'Sound is off';
+  const activePerks = (game.data.perks || []).map((id) => PERKS.find((perk) => perk.id === id)?.name).filter(Boolean);
+  const points = game.data.perkPoints || 0;
   return `
     <div class="modal-head">
       <div style="display:flex;align-items:center;gap:12px">
@@ -1165,6 +1457,8 @@ function menuModal() {
       <div class="menu-list">
         <button class="menu-row" data-action="save-now">${icon('check')} Save this moment <span class="menu-arrow">${icon('arrow')}</span></button>
         <button class="menu-row" data-action="rename-open">${icon('sparkle')} Change your name <span class="menu-arrow">${icon('arrow')}</span></button>
+        <button class="menu-row" data-action="makeover">${icon('heart')} Full makeover <span class="menu-arrow">${money(MAKEOVER_COST)}</span></button>
+        <button class="menu-row" data-action="open-perks">${icon('star')} Perks ${activePerks.length ? `· ${activePerks.join(', ')}` : ''} <span class="menu-arrow">${points} point${points === 1 ? '' : 's'}</span></button>
         <button class="menu-row" data-action="open-guide">${icon('book')} How to play <span class="menu-arrow">${icon('arrow')}</span></button>
         <button class="menu-row" data-action="open-about">${icon('heart')} About the game <span class="menu-arrow">${icon('arrow')}</span></button>
         <button class="menu-row" data-action="toggle-sound">${icon(game.ui.soundOn ? 'sound' : 'mute')} ${soundLabel} <span class="menu-arrow">${icon('arrow')}</span></button>
@@ -1211,9 +1505,9 @@ function guideModal() {
       <div class="about-list">
         <div class="about-item">${icon('heart')}<div><b>1. Spend time with someone</b><span>Visit a location in town. Chat and flirt to raise affection, or bring a gift that matches her taste. Energy limits how much you can do before resting.</span></div></div>
         <div class="about-item">${icon('moon')}<div><b>2. Date, propose, marry</b><span>At 30% affection you can ask her on a date. At 80% — and while dating — you can propose. A wedding makes it official and brings a partner into your household.</span></div></div>
-        <div class="about-item">${icon('work')}<div><b>3. Work and grow</b><span>Work a shift for coins. Rest to start a new day, restore energy, and collect household income. Partners and grown offspring contribute each morning.</span></div></div>
-        <div class="about-item">${icon('family')}<div><b>4. Raise a family</b><span>Once married, welcome an offspring for 200 coins. Raise them as they grow. Offspring do not work. Once grown, they can choose to join the family business.</span></div></div>
-        <div class="about-item">${icon('star')}<div><b>Dream board</b><span>Marry all six women, raise three grown offspring, and earn 5,000 coins to complete the family legacy. You can keep playing after the ending.</span></div></div>
+        <div class="about-item">${icon('work')}<div><b>3. Work and grow</b><span>Work a shift for funds. Rest to start a new day, restore energy, and collect household income. Partners and grown offspring contribute each morning.</span></div></div>
+        <div class="about-item">${icon('family')}<div><b>4. Raise a family</b><span>Once married, welcome an offspring for ${money(offspringPrice())}. Raise them as they grow. Offspring do not work. Once grown, they can choose to join the family business.</span></div></div>
+        <div class="about-item">${icon('star')}<div><b>Dream board</b><span>Marry all six women, raise three grown offspring, and earn ${money(GOALS.earned)} to complete the family legacy. You can keep playing after the ending.</span></div></div>
       </div>
       <div class="modal-actions"><button class="primary-button" data-action="close-modal">Got it</button></div>
     </div>
@@ -1307,7 +1601,7 @@ function useEnergy(amount) {
 
 function addAffection(character, amount) {
   const rel = game.data.rels[character.id];
-  rel.affection = clamp(rel.affection + amount, 0, 100);
+  rel.affection = clamp(rel.affection + affectionGain(amount), 0, 100);
   return rel;
 }
 
@@ -1370,6 +1664,10 @@ function openDateMode(characterId) {
     showToast('Not enough energy for a date. Rest first.', 'moon');
     return;
   }
+  if (game.data.coins < datePrice()) {
+    showToast(`A date costs ${money(datePrice())}. Work a shift or rest for household income.`, 'coin');
+    return;
+  }
   game.ui.modal = { type: 'character', charId: characterId, mode: 'date', feedback: null };
   renderModal();
 }
@@ -1381,7 +1679,12 @@ function chooseDate(characterId, index) {
     showToast('A date needs at least 30% affection.', 'heart');
     return;
   }
+  if (game.data.coins < datePrice()) {
+    showToast(`A date costs ${money(datePrice())}.`, 'coin');
+    return;
+  }
   if (!useEnergy(25)) return;
+  game.data.coins -= datePrice();
   const option = character.date.options[index] || character.date.options[0];
   addAffection(character, option.bonus);
   rel.dates += 1;
@@ -1400,11 +1703,12 @@ function giveGift(characterId, giftId) {
   const character = characterById(characterId);
   const gift = GIFTS.find((entry) => entry.id === giftId);
   if (!gift) return;
-  if (game.data.coins < gift.cost) {
-    showToast('Not enough coins for that gift. Work a shift or rest for income.', 'coin');
+  const price = giftPrice(gift);
+  if (game.data.coins < price) {
+    showToast(`That gift costs ${money(price)}. Work a shift or rest for income.`, 'coin');
     return;
   }
-  game.data.coins -= gift.cost;
+  game.data.coins -= price;
   game.data.stats.gifts += 1;
   game.data.rels[characterId].gifts += 1;
   const isFavorite = character.favoriteGift === gift.id;
@@ -1442,12 +1746,12 @@ function propose(characterId) {
     showToast('A proposal needs at least 80% affection.', 'heart');
     return;
   }
-  if (game.data.coins < 250) {
-    showToast('A ring costs 250 coins. Work a shift or rest for income.', 'coin');
+  if (game.data.coins < PROPOSAL_COST) {
+    showToast(`A ring costs ${money(PROPOSAL_COST)}. Work a shift or rest for income.`, 'coin');
     return;
   }
   if (!useEnergy(15)) return;
-  game.data.coins -= 250;
+  game.data.coins -= PROPOSAL_COST;
   rel.status = 'engaged';
   addLog(`Proposed to ${character.name} — she said yes.`, 'ring');
   game.ui.modal = { type: 'ceremony', ceremony: 'proposal', charId: character.id };
@@ -1465,31 +1769,34 @@ function marry(characterId) {
     showToast('First, propose and let her say yes.', 'ring');
     return;
   }
-  if (game.data.coins < 150) {
-    showToast('The wedding costs 150 coins. Work a shift first.', 'coin');
+  if (game.data.coins < WEDDING_COST) {
+    showToast(`The wedding costs ${money(WEDDING_COST)}. Work a shift first.`, 'coin');
     return;
   }
-  game.data.coins -= 150;
+  game.data.coins -= WEDDING_COST;
   rel.status = 'married';
+  game.data.perkPoints = (game.data.perkPoints || 0) + 1;
   addLog(`Married ${character.name}. The house grew warmer.`, 'heart');
   game.ui.modal = { type: 'ceremony', ceremony: 'wedding', charId: character.id };
   saveGame();
   renderAll();
   renderModal();
   playSound('ceremony');
-  showToast(`${character.name} is now your partner.`, 'heart');
+  showToast(`${character.name} is now your partner. +1 perk point.`, 'heart');
   checkAchievements();
 }
 
 function startFamily(characterId) {
   const character = characterById(characterId);
-  if (game.data.coins < 200) {
-    showToast('Welcoming an offspring costs 200 coins. Work a shift first.', 'coin');
+  const cost = offspringPrice();
+  if (game.data.coins < cost) {
+    showToast(`Welcoming an offspring costs ${money(cost)}. Work a shift first.`, 'coin');
     return;
   }
-  game.data.coins -= 200;
+  game.data.coins -= cost;
   const usedNames = new Set(game.data.children.map((child) => child.name));
   const name = CHILD_NAMES.find((entry) => !usedNames.has(entry)) || `${pick(CHILD_NAMES)} ${game.data.children.length + 1}`;
+  const looks = mixOffspringLooks(character);
   const child = {
     id: `child-${Date.now()}-${Math.floor(Math.random() * 9999)}`,
     name,
@@ -1497,12 +1804,7 @@ function startFamily(characterId) {
     stage: 0,
     working: false,
     bornDay: game.data.day,
-    skin: character.skin,
-    hair: character.hair,
-    hairStyle: character.hairStyle,
-    eye: character.eye,
-    accent: character.accent,
-    outfit: pick(['#e7b6a5', '#a8c0b0', '#a8bfd0', '#d8c1e0', '#e6c88e']),
+    ...looks,
   };
   game.data.children.push(child);
   addLog(`Welcomed ${child.name} into the family with ${character.name}.`, 'family');
@@ -1518,9 +1820,9 @@ function startFamily(characterId) {
 function raiseChild(childId) {
   const child = game.data.children.find((entry) => entry.id === childId);
   if (!child || child.stage >= 3) return;
-  const cost = STAGE_COSTS[child.stage + 1];
+  const cost = raisePrice(child.stage + 1);
   if (game.data.coins < cost) {
-    showToast(`Raising ${child.name} to the next stage costs ${cost} coins.`, 'coin');
+    showToast(`Raising ${child.name} to the next stage costs ${money(cost)}.`, 'coin');
     return;
   }
   game.data.coins -= cost;
@@ -1548,18 +1850,18 @@ function toggleChildWork(childId) {
 
 function workShift(element) {
   if (!useEnergy(25)) return;
-  const base = 55 + Math.floor(Math.random() * 31);
-  const bonus = totalMarriages() * 4;
+  const base = 280 + Math.floor(Math.random() * 161);
+  const bonus = totalMarriages() * 20;
   const earned = base + bonus;
   game.data.coins += earned;
   game.data.totalEarned += earned;
   game.data.stats.shifts += 1;
-  addLog(`Worked a shift at the inn and earned ${earned} coins.`, 'work');
+  addLog(`Worked a shift at the inn and earned ${money(earned)}.`, 'work');
   saveGame();
   renderAll();
   playSound('coin');
   floatHearts(element || $('#resource-bar'), 2);
-  showToast(`Shift complete · +${earned} coins`, 'coin');
+  showToast(`Shift complete · +${money(earned)}`, 'coin');
 }
 
 function endDay() {
@@ -1569,7 +1871,7 @@ function endDay() {
   game.data.day += 1;
   game.data.actionsToday = 0;
   game.data.energy = game.data.maxEnergy;
-  addLog(`Rested at home. Morning brought ${income.total} coins from the household.`, 'moon');
+  addLog(`Rested at home. Morning brought ${money(income.total)} from the household.`, 'moon');
   saveGame();
   renderAll();
   game.ui.modal = { type: 'summary', income };
@@ -1623,6 +1925,24 @@ function handleDocumentClick(event) {
     updateCreatorPreview();
     return;
   }
+  if (action === 'creator-body') {
+    game.ui.creator.bodyId = target.dataset.id;
+    updateCreatorPreview();
+    return;
+  }
+  if (action === 'creator-outfit-style') {
+    game.ui.creator.outfitStyleId = target.dataset.id;
+    updateCreatorPreview();
+    return;
+  }
+  if (action === 'creator-perk') {
+    const id = target.dataset.id;
+    const perks = game.ui.creator.perks;
+    if (perks.includes(id)) game.ui.creator.perks = perks.filter((perk) => perk !== id);
+    else if (perks.length < PERK_POINTS_START) game.ui.creator.perks = [...perks, id];
+    renderCreator();
+    return;
+  }
   if (action === 'creator-hair-style') {
     game.ui.creator.hairStyle = target.dataset.id;
     updateCreatorPreview();
@@ -1649,8 +1969,33 @@ function handleDocumentClick(event) {
     return;
   }
   if (action === 'back-to-title') {
+    if (game.ui.makeover) {
+      game.ui.makeover = false;
+      enterGame();
+      return;
+    }
     setScreen('title');
     updateContinueButton();
+    return;
+  }
+  if (action === 'makeover') {
+    startMakeover();
+    return;
+  }
+  if (action === 'open-perks') {
+    openModal('perks');
+    return;
+  }
+  if (action === 'buy-perk') {
+    buyPerk(target.dataset.id);
+    return;
+  }
+  if (action === 'scroll-up') {
+    scrollActivePanel(-1);
+    return;
+  }
+  if (action === 'scroll-down') {
+    scrollActivePanel(1);
     return;
   }
   if (action === 'new-game') {
@@ -1659,7 +2004,8 @@ function handleDocumentClick(event) {
     return;
   }
   if (action === 'start-story') {
-    beginNewStory();
+    if (game.ui.makeover) saveMakeover();
+    else beginNewStory();
     return;
   }
   if (action === 'continue-game') {
@@ -1857,6 +2203,7 @@ function init() {
   $('#icon-ledger').innerHTML = icon('ledger');
   $('#icon-menu').innerHTML = icon('menu');
   updateSoundButton();
+  updateScrollRail();
   document.addEventListener('click', handleDocumentClick);
   document.addEventListener('input', handleInput);
   document.addEventListener('change', handleInput);

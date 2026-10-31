@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#fff6ec" />
-  <meta name="description" content="Hanami Hearts is a cozy anime-inspired romance and family legacy sim. Customize your character, meet six wonderful women, build a home, and grow a family business." />
-  <title>Hanami Hearts — A Cozy Romance & Legacy Sim</title>
+  <meta name="description" content="Hanami Hearts is an early-2000s anime-style romance and family legacy sim. Customize your character, meet six wonderful women, build a home, and grow a family business." />
+  <title>Hanami Hearts — A Y2K Anime Romance & Legacy Sim</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><text y='52' font-size='48'>🌸</text></svg>" />
   <link rel="stylesheet" href="./assets/styles.css" />
 </head>
@@ -75,10 +75,10 @@
 
     <div class="title-layout">
       <div class="title-copy">
-        <p class="eyebrow"><span></span> A cozy romance &amp; legacy sim</p>
+        <p class="eyebrow"><span></span> An early-aughts romance &amp; legacy sim</p>
         <h1>Hanami<br /><em>Hearts</em></h1>
-        <p class="title-lede">A little town. Six unforgettable women. One home you build together.</p>
-        <p class="title-blurb">Customize your character, fall in love, marry, and raise a family whose story keeps growing. Every heart is an adult, every choice is yours, and every day ends with a table full of people you chose.</p>
+        <p class="title-lede">A little town. Six unforgettable women. $10,000 and one summer to begin.</p>
+        <p class="title-blurb">Fresh out of college with $10,000 in your pocket, you arrive in a town of women and start building the life you always pictured. Customize everything, choose perks, go on dates, marry, and raise offspring who carry both your looks. Every heart is an adult, every choice is yours, and every day ends with a table full of people you chose.</p>
         <div class="title-actions">
           <button class="primary-button large" id="new-game-button" data-action="new-game">
             <span>Begin a new story</span>
@@ -91,22 +91,22 @@
         </div>
         <div class="title-badges">
           <span>🌸 6 adult romances</span>
-          <span>🏡 Family legacy</span>
-          <span>✦ Cosy, non-explicit</span>
+          <span>💵 $10,000 starter funds</span>
+          <span>✦ Perks, makeovers &amp; a town map</span>
         </div>
       </div>
       <div class="title-art" id="title-art" aria-label="Three of the women of Hanami Hollow"></div>
     </div>
 
     <footer class="title-footer">
-      <span>Made for slow mornings &amp; second chances.</span>
+      <span>Made for slow mornings, flip phones &amp; second chances.</span>
       <span class="footer-note">All romanceable characters are adults · Autosaves locally</span>
     </footer>
   </section>
 
   <section id="screen-creator" class="screen creator-screen" hidden>
     <header class="creator-topbar">
-      <button class="ghost-button" data-action="back-to-title">← Back to title</button>
+      <button class="ghost-button" id="creator-back-button" data-action="back-to-title">← Back to title</button>
       <div class="creator-progress"><span class="active">01</span><i></i><span>02</span><i></i><span>03</span><b>Make it yours</b></div>
       <span class="creator-step">Character studio</span>
     </header>
@@ -167,6 +167,11 @@
       <div class="view-root" id="view-root"></div>
     </section>
   </main>
+
+  <div id="scroll-rail" class="scroll-rail" aria-label="Page scroll controls">
+    <button data-action="scroll-up" aria-label="Scroll up">↑</button>
+    <button data-action="scroll-down" aria-label="Scroll down">↓</button>
+  </div>
 
   <div id="modal-root" class="modal-root" aria-live="polite"></div>
   <div id="toast-root" class="toast-root" aria-live="polite"></div>
