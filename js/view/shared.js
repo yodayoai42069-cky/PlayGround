@@ -94,6 +94,7 @@ export function cardMarkup(card, options = {}) {
     `rarity-${def.rarity}`,
     options.selected ? "selected" : "",
     options.unplayable ? "unplayable" : "",
+    options.taken ? "taken" : "",
     options.className || "",
     card.upgraded ? "upgraded" : "",
   ].filter(Boolean).join(" ");
@@ -106,6 +107,7 @@ export function cardMarkup(card, options = {}) {
     <span class="card-divider"></span>
     <span class="card-text">${describeCard(card)}</span>
     <span class="card-foot"><span>${def.rarity === "starter" ? "STARTER" : rarity.label.toUpperCase()}</span><span>${char.name.toUpperCase()}</span></span>
+    ${options.taken ? '<span class="card-taken">TAKEN</span>' : ""}
   </${tag}>`;
 }
 

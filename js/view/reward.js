@@ -8,17 +8,26 @@ export function renderReward(game) {
   const reward = game.pending?.reward;
   if (!reward) return "";
   const char = game.run.char;
+  const takes = reward.takes || 1;
+  const picked = reward.picked || 0;
+  const remaining = Math.max(0, takes - picked);
   const heading = reward.boss ? "The act is <em>closed.</em>" : reward.elite ? "The elite is <em>done.</em>" : "The board is <em>clear.</em>";
   const kicker = reward.boss ? "BOSS DEFEATED" : reward.elite ? "ELITE DEFEATED" : "BATTLE WON";
   const cards = reward.cards.map((card, index) => cardMarkup(card, {
     action: "chooseReward",
     index,
     className: "reward-card",
+    disabled: card.taken,
+    taken: card.taken,
   })).join("");
+  const dense = reward.cards.length > 4 ? " dense" : "";
   const charm = reward.charm
     ? `<div class="reward-charm">Charm acquired · <strong>${reward.charm.name}</strong> — ${reward.charm.desc}</div>`
     : "";
   const act = ACTS[game.run.act];
+  const draftLine = remaining > 0
+    ? `Draft ${remaining} more card${remaining === 1 ? "" : "s"} — click a card to add it.`
+    : "Draft complete.";
 
   return `<main class="reward-screen" style="${charStyle(char)}">
     ${renderRunBar(game)}
@@ -26,17 +35,19 @@ export function renderReward(game) {
       <header class="reward-head">
         <div class="eyebrow no-line" style="justify-content:center">${kicker} · ACT ${act.roman}</div>
         <h1>${heading}</h1>
+        <p class="reward-draft-line">${draftLine}</p>
         <div class="reward-summary">
           <span>Gold <strong>+${reward.gold}</strong></span>
           <span>Deck <strong>${game.run.deck.length}</strong></span>
           <span>HP <strong>${game.run.hp}/${game.run.maxHp}</strong></span>
+          <span>Draft <strong>${picked}/${takes}</strong></span>
           ${reward.boss ? "<span>Next act <strong>imminent</strong></span>" : ""}
         </div>
         ${charm}
       </header>
-      <div class="reward-cards">${cards}</div>
+      <div class="reward-cards${dense}">${cards}</div>
       <div class="reward-actions">
-        <button type="button" class="btn btn-ghost" data-action="skipReward">Take no card</button>
+        <button type="button" class="btn btn-ghost" data-action="skipReward">${picked ? "Take no more cards" : "Take no card"}</button>
       </div>
     </div>
   </main>`;
@@ -69,7 +80,7 @@ export function renderShop(game) {
     const isUpgrade = mode === "upgrade";
     const disabled = isUpgrade
       ? card.upgraded || game.run.gold < shop.upgradeCost
-      : game.run.deck.length <= 5 || game.run.gold < shop.removeCost;
+      : game.run.deck.length <= 3 || game.run.gold < shop.removeCost;
     return `<button type="button" class="deck-pick" data-action="${isUpgrade ? "shopUpgrade" : "shopRemove"}" data-uid="${card.uid}" ${disabled ? "disabled" : ""}>
       <span><strong>${def.name}${card.upgraded ? " +" : ""}</strong></span><span>${isUpgrade ? (card.upgraded ? "honing max" : `${shop.upgradeCost}g`) : `${shop.removeCost}g`}</span>
     </button>`;
@@ -108,7 +119,7 @@ export function renderShop(game) {
             <span class="service-copy"><strong>Hone a Card</strong><span>Permanently upgrade one card for this run.</span></span>
             <span class="service-price">${shop.upgradeCost}g</span>
           </button>
-          <button type="button" class="service-card ${mode === "remove" ? "active" : ""}" data-action="shopMode" data-mode="remove" ${game.run.deck.length <= 5 || game.run.gold < shop.removeCost ? "disabled" : ""}>
+          <button type="button" class="service-card ${mode === "remove" ? "active" : ""}" data-action="shopMode" data-mode="remove" ${game.run.deck.length <= 3 || game.run.gold < shop.removeCost ? "disabled" : ""}>
             <span class="service-copy"><strong>Forget a Card</strong><span>Remove a card from your deck for this run.</span></span>
             <span class="service-price">${shop.removeCost}g</span>
           </button>

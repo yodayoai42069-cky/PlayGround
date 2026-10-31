@@ -193,6 +193,10 @@ export const TIPS = [
     body: "Every card costs Stamina. You refill at the start of each turn. Spend it all, or save a little for a perfect follow-up — the board does not wait.",
   },
   {
+    title: "Start with three",
+    body: "Every girl begins with a 3-card starter deck. Win a battle to draft 1 new card, an elite to draft 2, and a boss to draft 3. The deck you finish with is the run you played.",
+  },
+  {
     title: "The map is a checkerboard",
     body: "Climb one row at a time. Your next steps are the diagonal or straight-up tiles. Shops, events, offerings, and elite fights are all optional in the short term. The boss is not.",
   },

@@ -9,15 +9,15 @@ export const CARDS = {
     effects: [{ kind: "damage", amount: 3, hits: 2 }],
   },
   one_two: {
-    name: "One-Two", char: "roxy", cost: 1, type: "attack", rarity: "starter", target: "enemy",
+    name: "One-Two", char: "roxy", cost: 1, type: "attack", rarity: "common", target: "enemy",
     effects: [{ kind: "damage", amount: 4, hits: 1 }, { kind: "damage", amount: 2, hits: 1 }],
   },
   hook: {
-    name: "Hook", char: "roxy", cost: 1, type: "attack", rarity: "starter", target: "enemy",
+    name: "Hook", char: "roxy", cost: 1, type: "attack", rarity: "common", target: "enemy",
     effects: [{ kind: "damage", amount: 5, hits: 1 }, { kind: "status", status: "vulnerable", amount: 1, target: "enemy" }],
   },
   cheap_shot: {
-    name: "Cheap Shot", char: "roxy", cost: 0, type: "attack", rarity: "starter", target: "enemy", exhaust: true,
+    name: "Cheap Shot", char: "roxy", cost: 0, type: "attack", rarity: "common", target: "enemy", exhaust: true,
     effects: [{ kind: "damage", amount: 3, hits: 1 }, { kind: "status", status: "crit", amount: 10, target: "self" }],
   },
   knuckle_up: {
@@ -25,15 +25,15 @@ export const CARDS = {
     effects: [{ kind: "damage", amount: 2, hits: 3 }, { kind: "status", status: "crit", amount: 6, target: "self" }],
   },
   flurry: {
-    name: "Flurry", char: "roxy", cost: 2, type: "attack", rarity: "starter", target: "enemy",
+    name: "Flurry", char: "roxy", cost: 2, type: "attack", rarity: "common", target: "enemy",
     effects: [{ kind: "damage", amount: 3, hits: 3 }],
   },
   haymaker: {
-    name: "Haymaker", char: "roxy", cost: 2, type: "attack", rarity: "starter", target: "enemy",
+    name: "Haymaker", char: "roxy", cost: 2, type: "attack", rarity: "common", target: "enemy",
     effects: [{ kind: "damage", amount: 13, hits: 1 }],
   },
   redline: {
-    name: "Redline", char: "roxy", cost: 2, type: "attack", rarity: "starter", target: "enemy",
+    name: "Redline", char: "roxy", cost: 2, type: "attack", rarity: "common", target: "enemy",
     effects: [{ kind: "status", status: "crit", amount: 10, target: "self" }, { kind: "damage", amount: 6, hits: 2 }],
   },
   brace: {
@@ -87,11 +87,11 @@ export const CARDS = {
     effects: [{ kind: "status", status: "book", amount: 2, target: "enemy" }, { kind: "draw", amount: 1 }],
   },
   marginalia: {
-    name: "Marginalia", char: "marron", cost: 1, type: "attack", rarity: "starter", target: "enemy",
+    name: "Marginalia", char: "marron", cost: 1, type: "attack", rarity: "common", target: "enemy",
     effects: [{ kind: "damage", amount: 3, hits: 1 }, { kind: "status", status: "book", amount: 2, target: "enemy" }],
   },
   shush: {
-    name: "Shush", char: "marron", cost: 1, type: "skill", rarity: "starter", target: "enemy",
+    name: "Shush", char: "marron", cost: 1, type: "skill", rarity: "common", target: "enemy",
     effects: [{ kind: "status", status: "weak", amount: 2, target: "enemy" }, { kind: "status", status: "book", amount: 1, target: "enemy" }],
   },
   due_date: {
@@ -103,15 +103,15 @@ export const CARDS = {
     effects: [{ kind: "block", amount: 6 }, { kind: "status", status: "book", amount: 1, target: "enemy" }],
   },
   index: {
-    name: "Index", char: "marron", cost: 0, type: "skill", rarity: "starter", target: "self", exhaust: true,
+    name: "Index", char: "marron", cost: 0, type: "skill", rarity: "common", target: "self", exhaust: true,
     effects: [{ kind: "draw", amount: 2 }],
   },
   cite_sources: {
-    name: "Cite Sources", char: "marron", cost: 2, type: "attack", rarity: "starter", target: "enemy",
+    name: "Cite Sources", char: "marron", cost: 2, type: "attack", rarity: "common", target: "enemy",
     effects: [{ kind: "damage", amount: 5, hits: 1 }, { kind: "status", status: "book", amount: 4, target: "enemy" }],
   },
   whisper: {
-    name: "Whisper", char: "marron", cost: 1, type: "attack", rarity: "starter", target: "all",
+    name: "Whisper", char: "marron", cost: 1, type: "attack", rarity: "common", target: "all",
     effects: [{ kind: "damage", amount: 3, hits: 1 }, { kind: "status", status: "book", amount: 1, target: "allEnemies" }],
   },
   rubber_stamp: {
@@ -169,7 +169,7 @@ export const CARDS = {
     effects: [{ kind: "overshield", amount: 6 }, { kind: "block", amount: 2 }],
   },
   noble_guard: {
-    name: "Noble Guard", char: "elizabeth", cost: 1, type: "skill", rarity: "starter", target: "self",
+    name: "Noble Guard", char: "elizabeth", cost: 1, type: "skill", rarity: "common", target: "self",
     effects: [{ kind: "overshield", amount: 8 }],
   },
   riposte: {
@@ -177,23 +177,23 @@ export const CARDS = {
     effects: [{ kind: "damage", amount: 7, hits: 1 }, { kind: "overshield", amount: 5 }],
   },
   lunge: {
-    name: "Lunge", char: "elizabeth", cost: 2, type: "attack", rarity: "starter", target: "enemy",
+    name: "Lunge", char: "elizabeth", cost: 2, type: "attack", rarity: "common", target: "enemy",
     effects: [{ kind: "damage", amount: 11, hits: 1 }, { kind: "status", status: "bleed", amount: 2, target: "enemy" }],
   },
   white_glove: {
-    name: "White Glove", char: "elizabeth", cost: 0, type: "skill", rarity: "starter", target: "self", exhaust: true,
+    name: "White Glove", char: "elizabeth", cost: 0, type: "skill", rarity: "common", target: "self", exhaust: true,
     effects: [{ kind: "overshield", amount: 4 }],
   },
   thousand_cuts: {
-    name: "Thousand Cuts", char: "elizabeth", cost: 2, type: "attack", rarity: "starter", target: "enemy",
+    name: "Thousand Cuts", char: "elizabeth", cost: 2, type: "attack", rarity: "common", target: "enemy",
     effects: [{ kind: "damage", amount: 3, hits: 3 }, { kind: "status", status: "bleed", amount: 1, target: "enemy" }],
   },
   regal_bearing: {
-    name: "Regal Bearing", char: "elizabeth", cost: 1, type: "skill", rarity: "starter", target: "self",
+    name: "Regal Bearing", char: "elizabeth", cost: 1, type: "skill", rarity: "common", target: "self",
     effects: [{ kind: "strength", amount: 1 }, { kind: "overshield", amount: 3 }],
   },
   duel: {
-    name: "Duel", char: "elizabeth", cost: 3, type: "attack", rarity: "starter", target: "enemy",
+    name: "Duel", char: "elizabeth", cost: 3, type: "attack", rarity: "common", target: "enemy",
     effects: [{ kind: "damage", amount: 17, hits: 1 }, { kind: "status", status: "bleed", amount: 3, target: "enemy" }],
   },
   silver_bullet: {
@@ -259,31 +259,31 @@ export const CARDS = {
     effects: [{ kind: "damage", amount: 8, hits: 1 }, { kind: "summonMaxHp", amount: 4 }],
   },
   zoomies: {
-    name: "Zoomies", char: "brittany", cost: 2, type: "attack", rarity: "starter", target: "enemy",
+    name: "Zoomies", char: "brittany", cost: 2, type: "attack", rarity: "common", target: "enemy",
     effects: [{ kind: "damage", amount: 3, hits: 3 }, { kind: "summonMaxHp", amount: 2 }],
   },
   taco_tuesday: {
-    name: "Taco Tuesday", char: "brittany", cost: 3, type: "attack", rarity: "starter", target: "enemy",
+    name: "Taco Tuesday", char: "brittany", cost: 3, type: "attack", rarity: "common", target: "enemy",
     effects: [{ kind: "damage", amount: 14, hits: 1 }, { kind: "summonMaxHp", amount: 8 }],
   },
   guard_dog: {
-    name: "Guard Dog", char: "brittany", cost: 1, type: "skill", rarity: "starter", target: "self",
+    name: "Guard Dog", char: "brittany", cost: 1, type: "skill", rarity: "common", target: "self",
     effects: [{ kind: "block", amount: 7 }, { kind: "summonHeal", amount: 3 }],
   },
   puppy_power: {
-    name: "Puppy Power", char: "brittany", cost: 0, type: "attack", rarity: "starter", target: "enemy", exhaust: true,
+    name: "Puppy Power", char: "brittany", cost: 0, type: "attack", rarity: "common", target: "enemy", exhaust: true,
     effects: [{ kind: "tacoAttack", amount: 4 }],
   },
   beg: {
-    name: "Beg", char: "brittany", cost: 1, type: "skill", rarity: "starter", target: "enemy",
+    name: "Beg", char: "brittany", cost: 1, type: "skill", rarity: "common", target: "enemy",
     effects: [{ kind: "status", status: "weak", amount: 2, target: "enemy" }, { kind: "draw", amount: 1 }],
   },
   taco_returns: {
-    name: "Taco Returns", char: "brittany", cost: 2, type: "skill", rarity: "starter", target: "self",
+    name: "Taco Returns", char: "brittany", cost: 2, type: "skill", rarity: "common", target: "self",
     effects: [{ kind: "reviveTaco", amount: 12, heal: 6 }],
   },
   sunshine_state: {
-    name: "Sunshine State", char: "brittany", cost: 2, type: "skill", rarity: "starter", target: "self",
+    name: "Sunshine State", char: "brittany", cost: 2, type: "skill", rarity: "common", target: "self",
     effects: [{ kind: "strength", amount: 1 }, { kind: "summonMaxHp", amount: 5 }],
   },
   pup_cup: {

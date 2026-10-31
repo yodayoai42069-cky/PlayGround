@@ -24,7 +24,7 @@ export const CHARACTERS = {
       name: "Hot Streak",
       text: "Every critical hit grants +8% Crit for the rest of the turn. Critical hits deal 180% damage.",
     },
-    starter: ["jab", "jab", "one_two", "hook", "cheap_shot", "knuckle_up", "flurry", "haymaker", "redline", "brace"],
+    starter: ["jab", "knuckle_up", "brace"],
     outfits: [
       { name: "Wifebeater & Torn Denim", file: "assets/img/roxy.jpg", tier: 0, note: "The original bad idea." },
       { name: "Hellcat Leather", file: "assets/img/roxy_1102.jpg", tier: 1, note: "Borrowed jacket. Never returned." },
@@ -52,7 +52,7 @@ export const CHARACTERS = {
       name: "Overdue",
       text: "When an enemy reaches 10 Book, consume 10 and deal damage equal to 15% of that enemy's max HP.",
     },
-    starter: ["read", "read", "marginalia", "shush", "due_date", "bookmark", "bookmark", "index", "cite_sources", "whisper"],
+    starter: ["read", "due_date", "bookmark"],
     outfits: [
       { name: "Knit Sweater & Slacks", file: "assets/img/marron.jpg", tier: 0, note: "Soft, sensible, entirely underestimated." },
       { name: "Fern Cardigan", file: "assets/img/marron_2203.jpg", tier: 1, note: "The cardigan has pockets. So does she." },
@@ -80,7 +80,7 @@ export const CHARACTERS = {
       name: "Gilded Guard",
       text: "Overshield persists between turns. Begin each combat with 5 Overshield.",
     },
-    starter: ["cut", "cut", "parry", "noble_guard", "riposte", "lunge", "white_glove", "thousand_cuts", "regal_bearing", "duel"],
+    starter: ["cut", "parry", "riposte"],
     outfits: [
       { name: "White Dress", file: "assets/img/elizabeth.jpg", tier: 0, note: "Immaculate. Intimidating. Obviously." },
       { name: "Navy Rider", file: "assets/img/elizabeth_3304.jpg", tier: 1, note: "Dressage, but with a saber." },
@@ -108,7 +108,7 @@ export const CHARACTERS = {
       name: "Ride or Die",
       text: "Taco intercepts single-target attacks while alive. He bites for 3 at the start of each turn and grows with high-cost cards.",
     },
-    starter: ["fetch", "fetch", "good_boy", "big_bark", "zoomies", "taco_tuesday", "guard_dog", "puppy_power", "beg", "taco_returns"],
+    starter: ["fetch", "good_boy", "big_bark"],
     outfits: [
       { name: "Pink Blouse & Khakis", file: "assets/img/brittany.jpg", tier: 0, note: "California casual, zero survival instinct." },
       { name: "Varsity Pink", file: "assets/img/brittany_4405.jpg", tier: 1, note: "Letterman jacket, emotional support dog." },

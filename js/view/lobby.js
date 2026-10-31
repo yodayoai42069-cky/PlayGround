@@ -65,6 +65,7 @@ export function renderTitle(game) {
         </div>
         <div class="title-badges">
           <span>4 routes</span>
+          <span>3-card start</span>
           <span>3 climbs per run</span>
           <span>3 prestiges</span>
           <span>Permanent ash</span>
@@ -166,8 +167,9 @@ export function renderBriefing(game) {
         </div>
         <div class="briefing-meta-buffs">${metaBuff}</div>
         <div>
-          <div class="starter-deck-head"><span>Starter deck · ${c.starter.length} cards</span><span>${c.style}</span></div>
+          <div class="starter-deck-head"><span>Starter deck · ${c.starter.length} cards</span><span>Draft 1–3 after fights</span></div>
           <div class="starter-deck">${deck}</div>
+          <p class="empty-note" style="margin-top:8px">Win a battle to add 1 card, an elite to add 2, and a boss to add 3. Your deck is the run.</p>
         </div>
         <div class="btn-row">
           <button type="button" class="btn btn-primary" data-action="beginRun">Enter the staircase</button>

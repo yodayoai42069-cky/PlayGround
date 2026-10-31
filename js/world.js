@@ -119,7 +119,7 @@ export const worldMethods = {
 
   shopRemove(uid) {
     const shop = this.pending?.shop;
-    if (!shop || this.run.deck.length <= 5) {
+    if (!shop || this.run.deck.length <= 3) {
       this.notice = { text: "The deck is too small to cut.", tone: "bad" };
       this.emit();
       return;
@@ -278,25 +278,38 @@ export const worldMethods = {
   /* ---------------- rewards ---------------- */
 
   buildRewardCards(mode = "normal") {
+    const wanted = this.rewardTakes(mode) + 2;
     const cards = [];
     const used = new Set();
     let guard = 0;
-    while (cards.length < 3 && guard < 60) {
+    while (cards.length < wanted && guard < 120) {
       guard += 1;
       let rarity;
-      if (mode === "boss") rarity = "rare";
+      if (mode === "boss") rarity = cards.length < 3 ? "rare" : "uncommon";
       else if (mode === "elite") rarity = rewardRarity(Math.random() * 100 - 12);
       else rarity = rewardRarity(Math.random() * 100);
-      const pool = Object.keys(CARDS).filter((key) => {
+      let pool = Object.keys(CARDS).filter((key) => {
         const def = CARDS[key];
         return def.char === this.run.char && def.rarity === rarity && !used.has(key);
       });
-      if (!pool.length) continue;
+      if (!pool.length) {
+        pool = Object.keys(CARDS).filter((key) => {
+          const def = CARDS[key];
+          return def.char === this.run.char && def.rarity !== "starter" && !used.has(key);
+        });
+      }
+      if (!pool.length) break;
       const key = pick(pool);
       used.add(key);
-      cards.push({ key, upgraded: false });
+      cards.push({ key, upgraded: false, taken: false });
     }
     return cards;
+  },
+
+  rewardTakes(mode = "normal") {
+    if (mode === "boss") return 3;
+    if (mode === "elite") return 2;
+    return 1;
   },
 
   handleVictory(node) {
@@ -306,6 +319,7 @@ export const worldMethods = {
     run.battlesWon += 1;
     const isElite = node.type === "elite";
     const isBoss = node.type === "boss";
+    const mode = isBoss ? "boss" : isElite ? "elite" : "normal";
     let gold = 14 + run.act * 5 + rand(9);
     if (isElite) gold += 24;
     if (isBoss) gold += 38;
@@ -328,11 +342,14 @@ export const worldMethods = {
       reward: {
         node,
         gold,
-        cards: this.buildRewardCards(isBoss ? "boss" : isElite ? "elite" : "normal"),
+        mode,
+        takes: this.rewardTakes(mode),
+        picked: 0,
+        done: false,
+        cards: this.buildRewardCards(mode),
         charm: charmInfo,
         elite: isElite,
         boss: isBoss,
-        taken: false,
       },
     };
     this.screen = "reward";
@@ -341,27 +358,43 @@ export const worldMethods = {
 
   chooseReward(index) {
     const reward = this.pending?.reward;
-    if (!reward || reward.taken) return;
+    if (!reward || reward.done) return;
     const choice = reward.cards[index];
-    if (!choice) return;
-    reward.taken = true;
+    if (!choice || choice.taken) return;
+    choice.taken = true;
     this.addCard(choice.key);
-    this.notice = { text: `${CARDS[choice.key].name} added to your deck.`, tone: "good" };
+    reward.picked += 1;
+    this.notice = {
+      text: `${CARDS[choice.key].name} added to your deck (${reward.picked}/${reward.takes}).`,
+      tone: "good",
+    };
+    if (reward.picked >= reward.takes || reward.cards.every((card) => card.taken)) {
+      this.finishReward();
+      return;
+    }
+    this.emit();
+  },
+
+  finishReward() {
+    const reward = this.pending?.reward;
+    if (!reward || reward.done) return;
+    reward.done = true;
     this.completeNodeAndAdvance(reward.node);
   },
 
   skipReward() {
     const reward = this.pending?.reward;
-    if (!reward || reward.taken) return;
-    reward.taken = true;
-    this.notice = { text: "You leave the card where it lies.", tone: "" };
+    if (!reward || reward.done) return;
+    reward.done = true;
+    this.notice = {
+      text: reward.picked ? "You leave the rest where they lie." : "You leave the cards where they lie.",
+      tone: "",
+    };
     this.completeNodeAndAdvance(reward.node);
   },
 
   continueReward() {
-    const reward = this.pending?.reward;
-    if (!reward) return;
-    this.completeNodeAndAdvance(reward.node);
+    this.finishReward();
   },
 
   completeNodeAndAdvance(node) {

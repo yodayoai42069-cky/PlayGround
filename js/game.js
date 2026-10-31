@@ -311,7 +311,7 @@ export class Game {
     if (spec.removeRandomCards) {
       const removable = [...run.deck];
       shuffle(removable);
-      const removed = removable.slice(0, Math.min(spec.removeRandomCards, Math.max(0, run.deck.length - 4)));
+      const removed = removable.slice(0, Math.min(spec.removeRandomCards, Math.max(0, run.deck.length - 3)));
       for (const card of removed) {
         this.removeCard(card.uid);
         lines.push(`Removed ${CARDS[card.key].name}.`);
