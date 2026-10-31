@@ -15,11 +15,17 @@ cd "$(dirname "$0")"
 : "${CAPTURE_DIR:?Set CAPTURE_DIR}"
 
 # Wait for real rendered content, not a blank shell: the app always renders
-# the menu rail + at least one selectable item.
-export CAPTURE_READY_SELECTOR="${CAPTURE_READY_SELECTOR:-#panel .mitem}"
+# its menu panel with exactly ONE highlighted (selected) item, so
+# "#panel .mitem.sel" resolves to a single element (the runtime capture script
+# uses Playwright's strict locator, which fails on multi-element matches —
+# "#panel .mitem" alone resolves to ~9 items on the title screen).
+export CAPTURE_READY_SELECTOR="${CAPTURE_READY_SELECTOR:-#panel .mitem.sel}"
+: "${RUNTIME_DIR:=/home/runner/work/_temp/omgithub-runtime}"
+export RUNTIME_DIR
 
-# Timing per internal stage; the browser closes in the script's finally block.
-/usr/bin/time -p test -f "${RUNTIME_DIR:?}/scripts/default-capture.mjs"
+# Timing per internal stage; the browser closes in the capture script's finally block.
+/usr/bin/time -p mkdir -p "$CAPTURE_DIR"
+/usr/bin/time -p test -f "$RUNTIME_DIR/scripts/default-capture.mjs"
 /usr/bin/time -p echo "capture.sh: capturing $CAPTURE_URL -> $CAPTURE_DIR (selector: $CAPTURE_READY_SELECTOR)"
 
 /usr/bin/time -p node "${RUNTIME_DIR:?}/scripts/default-capture.mjs"
