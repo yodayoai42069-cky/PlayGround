@@ -23,6 +23,10 @@ export const HAIR_STYLES = [
   { id: 'bob', label: 'Bob' },
   { id: 'pony', label: 'Ponytail' },
   { id: 'pixie', label: 'Pixie' },
+  { id: 'hime', label: 'Hime cut' },
+  { id: 'braids', label: 'Braids' },
+  { id: 'long', label: 'Long straight' },
+  { id: 'short', label: 'Short crop' },
 ];
 
 export const OUTFIT_COLORS = [
@@ -32,6 +36,10 @@ export const OUTFIT_COLORS = [
   { id: 'amber', color: '#cf9953', dark: '#a97839' },
   { id: 'plum', color: '#7a6a9d', dark: '#5b4d7b' },
   { id: 'clay', color: '#b65b5b', dark: '#8f4141' },
+  { id: 'mint', color: '#a8d8b9', dark: '#6fa38c' },
+  { id: 'lavender', color: '#b7a8d8', dark: '#8a7aa8' },
+  { id: 'peach', color: '#f2c6a5', dark: '#dda27e' },
+  { id: 'slate', color: '#8b93a0', dark: '#6a727e' },
 ];
 
 export const ACCESSORIES = [
@@ -40,6 +48,16 @@ export const ACCESSORIES = [
   { id: 'earrings', label: 'Earrings' },
   { id: 'hairpin', label: 'Hairpin' },
   { id: 'scarf', label: 'Neckerchief' },
+  { id: 'bow', label: 'Bow' },
+  { id: 'headband', label: 'Headband' },
+  { id: 'choker', label: 'Choker' },
+];
+
+export const BODY_TYPES = [
+  { id: 'soft', label: 'Soft' },
+  { id: 'slim', label: 'Slim' },
+  { id: 'curvy', label: 'Curvy' },
+  { id: 'athletic', label: 'Athletic' },
 ];
 
 export const EYE_COLORS = [

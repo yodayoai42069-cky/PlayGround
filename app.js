@@ -12,6 +12,7 @@ import {
   SKIN_TONES,
   STAGE_COSTS,
   STAGES,
+  BODY_TYPES,
   characterById,
 } from './assets/data.js';
 import {
@@ -42,6 +43,7 @@ const game = {
       eyeId: 'violet',
       outfitId: 'rose',
       accessory: 'earrings',
+      bodyType: 'soft',
     },
     modal: null,
   },
@@ -263,6 +265,8 @@ function normalizeSave(data) {
   data.totalEarned = Number.isFinite(data.totalEarned) ? data.totalEarned : 0;
   data.settings = data.settings || { sound: true };
   data.settings.sound = data.settings.sound !== false;
+  data.perks = Array.isArray(data.perks) ? data.perks : [];
+  data.perkPoints = Number.isFinite(data.perkPoints) ? data.perkPoints : 0;
   CHARACTERS.forEach((character) => {
     data.rels[character.id] = {
       affection: 0,
@@ -315,12 +319,14 @@ function createInitialState(player) {
     actionsToday: 0,
     energy: 100,
     maxEnergy: 100,
-    coins: 180,
+    coins: 10000,
     rels,
     children: [],
     log: [],
     achievements: [],
     stats: { gifts: 0, dates: 0, shifts: 0 },
+    perks: [],
+    perkPoints: 0,
     totalEarned: 0,
     completed: false,
     seenIntro: false,
@@ -340,7 +346,7 @@ function playerFromCreator() {
     eyeColor: findById(EYE_COLORS, creator.eyeId).color,
     outfitColor: findById(OUTFIT_COLORS, creator.outfitId),
     accessory: creator.accessory,
-    body: 'soft',
+    body: creator.bodyType || 'soft',
   };
 }
 
