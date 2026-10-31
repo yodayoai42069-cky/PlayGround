@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#fff6ec" />
+  <meta name="description" content="Hanami Hearts is a cozy anime-inspired romance and family legacy sim. Customize your character, meet six wonderful women, build a home, and grow a family business." />
+  <title>Hanami Hearts — A Cozy Romance & Legacy Sim</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><text y='52' font-size='48'>🌸</text></svg>" />
+  <link rel="stylesheet" href="./assets/styles.css" />
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <div id="petal-layer" class="petal-layer" aria-hidden="true"></div>
+
+  <section id="screen-title" class="screen title-screen">
+    <div class="title-sky" aria-hidden="true">
+      <span class="sun-disc"></span>
+      <span class="cloud cloud-1"></span>
+      <span class="cloud cloud-2"></span>
+      <span class="cloud cloud-3"></span>
+      <svg class="title-hills" viewBox="0 0 1600 520" preserveAspectRatio="none">
+        <path d="M0 390C156 303 310 303 476 354c160 49 292 47 443-8 173-63 365-75 681 32v142H0Z" fill="#c9d8bf" opacity=".75"/>
+        <path d="M0 423c210-58 369-53 529 5 173 63 361 49 544-7 200-61 374-55 527 3v96H0Z" fill="#9fb79b" opacity=".62"/>
+        <path d="M0 462c211-43 391-31 566 7 199 43 387 28 565-6 180-34 332-26 469 13v44H0Z" fill="#708c78" opacity=".64"/>
+      </svg>
+      <svg class="blossom-branch" viewBox="0 0 700 500" aria-hidden="true">
+        <path d="M-20 80C110 92 226 151 322 238c50 45 91 89 133 146" fill="none" stroke="#5e473e" stroke-width="13" stroke-linecap="round"/>
+        <path d="M154 126c-37-12-64-39-69-77M255 184c45 2 82-14 108-49M283 215c-28 6-55 4-81-7M384 295c44 6 82-6 112-35M425 341c-27 9-52 8-77-3" fill="none" stroke="#5e473e" stroke-width="7" stroke-linecap="round"/>
+        <g fill="#f3a5b2">
+          <circle cx="86" cy="108" r="17"/><circle cx="104" cy="91" r="13"/><circle cx="65" cy="84" r="11"/>
+          <circle cx="200" cy="128" r="15"/><circle cx="219" cy="111" r="12"/><circle cx="183" cy="110" r="10"/>
+          <circle cx="369" cy="140" r="16"/><circle cx="388" cy="121" r="12"/><circle cx="349" cy="121" r="10"/>
+          <circle cx="287" cy="208" r="14"/><circle cx="304" cy="193" r="11"/><circle cx="270" cy="193" r="10"/>
+          <circle cx="503" cy="256" r="17"/><circle cx="521" cy="237" r="12"/><circle cx="483" cy="238" r="11"/>
+          <circle cx="418" cy="338" r="14"/><circle cx="436" cy="323" r="11"/><circle cx="402" cy="320" r="9"/>
+          <circle cx="121" cy="155" r="10"/><circle cx="540" cy="290" r="10"/>
+        </g>
+        <g fill="#fff6ec" opacity=".9">
+          <circle cx="94" cy="107" r="4"/><circle cx="207" cy="127" r="4"/><circle cx="376" cy="139" r="4"/>
+          <circle cx="293" cy="207" r="4"/><circle cx="510" cy="255" r="4"/><circle cx="425" cy="337" r="4"/>
+        </g>
+      </svg>
+      <svg class="title-town" viewBox="0 0 900 260" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+        <g fill="#f7eadc" stroke="#7d6b6b" stroke-opacity=".25" stroke-width="2">
+          <path d="M40 228V143h84v85M52 143V120h60v23M64 120V100h36v20"/>
+          <path d="M144 228V160h55v68M150 160V141h43v19"/>
+          <path d="M642 228V143h84v85M654 143V120h60v23M666 120V100h36v20"/>
+          <path d="M742 228V160h55v68M748 160V141h43v19"/>
+          <path d="M268 228V118h112v110M280 118V96h88v22M292 96V76h64v20"/>
+          <path d="M580 228V118h112v110M592 118V96h88v22M604 96V76h64v20"/>
+        </g>
+        <g fill="#e6a08f" opacity=".65">
+          <rect x="70" y="167" width="18" height="23" rx="3"/><rect x="96" y="167" width="18" height="23" rx="3"/>
+          <rect x="158" y="181" width="14" height="18" rx="3"/><rect x="672" y="167" width="18" height="23" rx="3"/>
+          <rect x="698" y="167" width="18" height="23" rx="3"/><rect x="756" y="181" width="14" height="18" rx="3"/>
+          <rect x="294" y="142" width="18" height="26" rx="3"/><rect x="322" y="142" width="18" height="26" rx="3"/>
+          <rect x="350" y="142" width="18" height="26" rx="3"/><rect x="606" y="142" width="18" height="26" rx="3"/>
+          <rect x="634" y="142" width="18" height="26" rx="3"/><rect x="662" y="142" width="18" height="26" rx="3"/>
+        </g>
+        <g fill="#738c7a">
+          <path d="M232 228c-3-52 12-88 30-115-9 44 4 78 13 115Z"/><path d="M705 228c-4-44 6-81 28-112-8 42 0 80 8 112Z"/>
+        </g>
+        <g fill="#f0a6b2"><circle cx="263" cy="113" r="22"/><circle cx="246" cy="128" r="17"/><circle cx="279" cy="132" r="18"/><circle cx="731" cy="116" r="20"/><circle cx="714" cy="131" r="16"/><circle cx="747" cy="134" r="17"/></g>
+        <path d="M0 228h900v32H0Z" fill="#718d79" opacity=".45"/>
+      </svg>
+    </div>
+
+    <header class="title-topbar">
+      <div class="wordmark"><span class="wordmark-mark">花</span><span>Hanami<br><b>Hearts</b></span></div>
+      <div class="title-top-actions">
+        <button class="ghost-button light" data-action="open-about">About the game</button>
+      </div>
+    </header>
+
+    <div class="title-layout">
+      <div class="title-copy">
+        <p class="eyebrow"><span></span> A cozy romance &amp; legacy sim</p>
+        <h1>Hanami<br /><em>Hearts</em></h1>
+        <p class="title-lede">A little town. Six unforgettable women. One home you build together.</p>
+        <p class="title-blurb">Customize your character, fall in love, marry, and raise a family whose story keeps growing. Every heart is an adult, every choice is yours, and every day ends with a table full of people you chose.</p>
+        <div class="title-actions">
+          <button class="primary-button large" id="new-game-button" data-action="new-game">
+            <span>Begin a new story</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 5.5 19.5 12 13 18.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="secondary-button large" id="continue-button" data-action="continue-game" disabled>
+            <span>Continue</span>
+            <small id="continue-label">No story yet</small>
+          </button>
+        </div>
+        <div class="title-badges">
+          <span>🌸 6 adult romances</span>
+          <span>🏡 Family legacy</span>
+          <span>✦ Cosy, non-explicit</span>
+        </div>
+      </div>
+      <div class="title-art" id="title-art" aria-label="Three of the women of Hanami Hollow"></div>
+    </div>
+
+    <footer class="title-footer">
+      <span>Made for slow mornings &amp; second chances.</span>
+      <span class="footer-note">All characters are 18+ · Autosaves locally</span>
+    </footer>
+  </section>
+
+  <section id="screen-creator" class="screen creator-screen" hidden>
+    <header class="creator-topbar">
+      <button class="ghost-button" data-action="back-to-title">← Back to title</button>
+      <div class="creator-progress"><span class="active">01</span><i></i><span>02</span><i></i><span>03</span><b>Make it yours</b></div>
+      <span class="creator-step">Character studio</span>
+    </header>
+    <div class="creator-layout">
+      <div class="creator-preview-panel">
+        <div class="preview-arch">
+          <div class="preview-halo"></div>
+          <div class="preview-stars" aria-hidden="true">✦　✧　✦</div>
+          <div id="creator-preview" class="creator-preview"></div>
+          <div class="preview-caption"><span>Your story starts here</span><b id="creator-name-preview">A new neighbour</b></div>
+        </div>
+        <div class="preview-quote">“The town has been waiting for someone like you.”</div>
+      </div>
+      <div class="creator-form-panel">
+        <p class="eyebrow"><span></span> Your character</p>
+        <h2>Who are you<br /><em>arriving as?</em></h2>
+        <p class="form-intro">Pick a look, a name, and the little details that make you feel at home. You can change your name in the menu later.</p>
+        <div id="creator-form"></div>
+        <div class="creator-footer">
+          <div class="creator-summary" id="creator-summary"></div>
+          <button class="primary-button large" id="start-story-button" data-action="start-story"><span>Move to Hanami Hollow</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 5.5 19.5 12 13 18.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main id="screen-game" class="game-shell" hidden>
+    <aside class="rail">
+      <button class="rail-wordmark" data-action="go-view" data-view="town" aria-label="Hanami Hearts home">
+        <span class="rail-mark">花</span>
+        <span>Hanami<br /><b>Hearts</b></span>
+      </button>
+      <div class="rail-player" id="rail-player"></div>
+      <nav class="rail-nav" aria-label="Game sections">
+        <button class="rail-nav-button active" data-action="go-view" data-view="town"><span class="nav-icon" id="icon-town"></span><span>Town</span><small>Today</small></button>
+        <button class="rail-nav-button" data-action="go-view" data-view="hearts"><span class="nav-icon" id="icon-hearts"></span><span>Hearts</span><small id="nav-hearts-count">0/6</small></button>
+        <button class="rail-nav-button" data-action="go-view" data-view="home"><span class="nav-icon" id="icon-home"></span><span>Home</span><small id="nav-family-count">Empty</small></button>
+        <button class="rail-nav-button" data-action="go-view" data-view="ledger"><span class="nav-icon" id="icon-ledger"></span><span>Ledger</span><small>Story</small></button>
+      </nav>
+      <div class="rail-bottom">
+        <div class="rail-day" id="rail-day"></div>
+        <button class="rail-rest" data-action="end-day"><span>Rest &amp; end day</span><b>→</b></button>
+        <div class="rail-tools">
+          <button class="icon-button" data-action="toggle-sound" id="sound-button" aria-label="Toggle sound"></button>
+          <button class="icon-button" data-action="open-menu" aria-label="Open menu"><span id="icon-menu"></span></button>
+        </div>
+      </div>
+    </aside>
+
+    <section class="stage">
+      <header class="stage-topbar">
+        <div class="stage-title">
+          <p class="top-kicker" id="top-kicker">Hanami Hollow · Day 1</p>
+          <h2 id="top-title">A warm welcome</h2>
+        </div>
+        <div class="resource-bar" id="resource-bar"></div>
+      </header>
+      <div class="view-root" id="view-root"></div>
+    </section>
+  </main>
+
+  <div id="modal-root" class="modal-root" aria-live="polite"></div>
+  <div id="toast-root" class="toast-root" aria-live="polite"></div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
