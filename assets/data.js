@@ -446,7 +446,7 @@ export const CHILD_NAMES = [
   'Mio', 'Souta', 'Yui', 'Kohaku', 'Tama', 'Akira', 'Nami', 'Isamu',
 ];
 
-export const STAGES = ['Baby', 'Little one', 'Teen', 'Grown'];
+export const STAGES = ['New arrival', 'Little one', 'Growing', 'Grown'];
 export const STAGE_COSTS = [0, 90, 150, 240];
 
 export const REL_STAGES = [

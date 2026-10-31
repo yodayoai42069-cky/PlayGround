@@ -35,7 +35,7 @@ const game = {
     soundOn: true,
     creator: {
       name: '',
-      pronoun: 'they',
+      pronoun: 'she',
       skinId: 'peach',
       hairStyle: 'wavy',
       hairColorId: 'chestnut',
@@ -80,11 +80,10 @@ function findById(list, id) {
 
 function getPronouns(player) {
   const map = {
-    they: { subject: 'they', object: 'them', possessive: 'their', label: 'they / them' },
     she: { subject: 'she', object: 'her', possessive: 'her', label: 'she / her' },
     he: { subject: 'he', object: 'him', possessive: 'his', label: 'he / him' },
   };
-  return map[player?.pronoun] || map.they;
+  return map[player?.pronoun] || map.she;
 }
 
 function phaseFor(actions) {
@@ -247,7 +246,7 @@ function normalizeSave(data) {
   data.version = 1;
   data.player = data.player || {};
   data.player.name = data.player.name || 'Haru';
-  data.player.pronoun = data.player.pronoun || 'they';
+  data.player.pronoun = ['she', 'he'].includes(data.player.pronoun) ? data.player.pronoun : 'she';
   data.energy = Number.isFinite(data.energy) ? data.energy : 100;
   data.maxEnergy = 100;
   data.coins = Number.isFinite(data.coins) ? data.coins : 180;
@@ -362,11 +361,10 @@ function renderCreator() {
           <input id="player-name" class="name-input" maxlength="18" autocomplete="off" placeholder="e.g. Haru" value="${escapeHtml(creator.name)}" />
         </div>
         <div class="form-block">
-          <label for="player-pronoun">Pronouns</label>
+          <label for="player-pronoun">Gender</label>
           <select id="player-pronoun" class="select-input">
-            <option value="they" ${creator.pronoun === 'they' ? 'selected' : ''}>they / them</option>
-            <option value="she" ${creator.pronoun === 'she' ? 'selected' : ''}>she / her</option>
-            <option value="he" ${creator.pronoun === 'he' ? 'selected' : ''}>he / him</option>
+            <option value="she" ${creator.pronoun === 'she' ? 'selected' : ''}>Female · she / her</option>
+            <option value="he" ${creator.pronoun === 'he' ? 'selected' : ''}>Male · he / him</option>
           </select>
         </div>
       </div>
@@ -502,10 +500,10 @@ function renderRail() {
   $('#rail-day').innerHTML = `
     <div class="day-number"><span>Day ${game.data.day}</span><span>${dayName(game.data.day)}</span></div>
     <div class="day-number" style="margin-top:4px;font-size:.8rem"><span>${phase}</span><span>${game.data.energy}⚡</span></div>
-    <p>${spouses.length ? `${plural(spouses.length, 'partner')} at home` : 'The house is quiet — for now.'}${children ? ` · ${plural(children, 'child', 'children')}` : ''}</p>
+    <p>${spouses.length ? `${plural(spouses.length, 'partner')} at home` : 'The house is quiet — for now.'}${children ? ` · ${plural(children, 'offspring', 'offspring')}` : ''}</p>
   `;
   $('#nav-hearts-count').textContent = `${totalMarriages()}/6`;
-  $('#nav-family-count').textContent = children ? plural(children, 'child', 'children') : 'Empty';
+  $('#nav-family-count').textContent = children ? plural(children, 'offspring', 'offspring') : 'Empty';
   $$('.rail-nav-button').forEach((button) => {
     button.classList.toggle('active', button.dataset.view === game.ui.view);
   });
@@ -517,7 +515,7 @@ function renderTopbar() {
   const viewCopy = {
     town: { kicker: `Hanami Hollow · Day ${game.data.day} · ${phase}`, title: 'A warm welcome' },
     hearts: { kicker: `Hearts · ${hearts} of 6 marriages`, title: 'Six stories, one heart' },
-    home: { kicker: `Home · ${plural(game.data.children.length, 'child', 'children')}`, title: 'The life you are building' },
+    home: { kicker: `Home · ${plural(game.data.children.length, 'offspring', 'offspring')}`, title: 'The life you are building' },
     ledger: { kicker: `Ledger · ${game.data.totalEarned} coins earned`, title: 'Your story so far' },
   };
   const copy = viewCopy[game.ui.view] || viewCopy.town;
@@ -569,7 +567,7 @@ function townView() {
         </div>
         <div class="hero-mini-stats">
           <span><b>${spouses.length}/6</b>hearts won</span>
-          <span><b>${data.children.length}</b>children</span>
+          <span><b>${data.children.length}</b>offspring</span>
           <span><b>+${daily.total}</b>daily income</span>
         </div>
       </aside>
@@ -619,7 +617,7 @@ function townView() {
           <p>A life big enough to hold everyone you love.</p>
           <div class="dream-list">
             ${dreamItem('Marry all six women', totalMarriages(), GOALS.marriages)}
-            ${dreamItem('Raise grown children', getGrownChildren().length, GOALS.grown)}
+            ${dreamItem('Raise grown offspring', getGrownChildren().length, GOALS.grown)}
             ${dreamItem('Earn a family fortune', game.data.totalEarned, GOALS.earned, 'coins')}
           </div>
         </div>
@@ -632,7 +630,7 @@ function townView() {
               <span>${renderPlayerPortrait(game.data.player, { mode: 'face' })}</span>
               ${householdPortraits || '<span class="empty-avatar">+</span>'}
             </div>
-            <div class="household-copy"><b>${spouses.length ? plural(spouses.length, 'partner') : 'Just you'}</b><br />${plural(game.data.children.length, 'child', 'children')} · ${plural(getGrownChildren().length, 'grown child', 'grown children')}</div>
+            <div class="household-copy"><b>${spouses.length ? plural(spouses.length, 'partner') : 'Just you'}</b><br />${plural(game.data.children.length, 'offspring', 'offspring')} · ${plural(getGrownChildren().length, 'grown offspring', 'grown offspring')}</div>
           </div>
         </div>
       </aside>
@@ -654,7 +652,7 @@ function heartsView() {
         <h3>The women of <em>Hanami Hollow</em></h3>
         <p>Every relationship is consensual and grows at its own pace. Show up, listen, and let affection become something deeper.</p>
       </div>
-      <span class="heading-note">${totalMarriages()} of 6 married · ${game.data.children.length} children</span>
+      <span class="heading-note">${totalMarriages()} of 6 married · ${game.data.children.length} offspring</span>
     </div>
     <div class="hearts-grid">
       ${CHARACTERS.map((character) => {
@@ -691,13 +689,13 @@ function homeView() {
   return `
     <section class="home-hero">
       <div>
-        <div class="hero-date">Your home<i></i>${spouses.length ? plural(spouses.length, 'heart') : 'A quiet beginning'}<i></i>${plural(children.length, 'child', 'children')}</div>
+        <div class="hero-date">Your home<i></i>${spouses.length ? plural(spouses.length, 'heart') : 'A quiet beginning'}<i></i>${plural(children.length, 'offspring', 'offspring')}</div>
         <h3>${spouses.length ? `Welcome home, <em>${escapeHtml(game.data.player.name)}</em>.` : `This house is ready for <em>your story</em>.`}</h3>
         <p>${spouses.length ? 'The kitchen is warm, the table is full, and someone has left the porch light on for you.' : 'Love is not a race. Visit the town, make a friend, and let the house fill up when the time is right.'}</p>
       </div>
       <div class="home-hero-side">
         <div class="home-stat"><b>${spouses.length}</b><span>partners</span></div>
-        <div class="home-stat"><b>${children.length}</b><span>children</span></div>
+        <div class="home-stat"><b>${children.length}</b><span>offspring</span></div>
         <div class="home-stat"><b>${grown}</b><span>grown</span></div>
       </div>
     </section>
@@ -721,11 +719,11 @@ function homeView() {
 
         <section class="panel">
           <div class="panel-head">
-            <div><h4>The nursery &amp; family business</h4><p>Children are raised with care. Grown children choose their own path.</p></div>
-            ${spouses.length ? `<button class="mini-button gold" data-action="family-modal">${icon('family')} Have a child · 200</button>` : ''}
+            <div><h4>Offspring &amp; family business</h4><p>Offspring are raised with care. When grown, they choose their own path.</p></div>
+            ${spouses.length ? `<button class="mini-button gold" data-action="family-modal">${icon('family')} Welcome an offspring · 200</button>` : ''}
           </div>
-          ${children.length ? `<div class="children-list">${children.map(childView).join('')}</div>` : `<div class="empty-family"><b>No little footsteps yet.</b><p>${spouses.length ? 'When you are ready, start a family. Every child is welcomed, raised, and free to choose their own future.' : 'Marry someone first, then the two of you can decide when the house is ready for a child.'}</p></div>`}
-          <div class="house-note">${icon('check')} <span>Children are dependents, not employees. Once they are grown (18+), they may choose to join the family business and contribute to the household.</span></div>
+          ${children.length ? `<div class="children-list">${children.map(childView).join('')}</div>` : `<div class="empty-family"><b>No little footsteps yet.</b><p>${spouses.length ? 'When you are ready, start a family. Every offspring is welcomed, raised, and free to choose their own future.' : 'Marry someone first, then the two of you can decide when the house is ready for an offspring.'}</p></div>`}
+          <div class="house-note">${icon('check')} <span>Offspring are dependents, not employees. In time, when they are grown, they may choose to join the family business and contribute to the household.</span></div>
         </section>
       </div>
 
@@ -735,7 +733,7 @@ function homeView() {
           <div class="income-list">
             <div class="income-row"><span>${icon('home')} Base household</span><b>+${income.base}</b></div>
             <div class="income-row"><span>${icon('heart')} Partners (${income.spouses})</span><b>+${income.spouse}</b></div>
-            <div class="income-row"><span>${icon('work')} Grown children (${income.workers})</span><b>+${income.child}</b></div>
+            <div class="income-row"><span>${icon('work')} Grown offspring (${income.workers})</span><b>+${income.child}</b></div>
           </div>
           <div class="income-total"><span>Next morning</span><b>+${income.total}</b></div>
           <div class="home-action-stack">
@@ -751,7 +749,7 @@ function homeView() {
             <div class="today-row">${icon('family')} Family dinner <b>+love</b></div>
             <div class="today-row">${icon('coin')} Business ledger <b>+${income.total}/day</b></div>
           </div>
-          <div class="house-note">${icon('sparkle')} <span>Marriage adds a partner's contribution to the household. Grown children who join the business add more. Every coin can become a gift, a gesture, a new beginning.</span></div>
+          <div class="house-note">${icon('sparkle')} <span>Marriage adds a partner's contribution to the household. Grown offspring who join the business add more. Every coin can become a gift, a gesture, a new beginning.</span></div>
         </section>
       </aside>
     </div>
@@ -767,7 +765,7 @@ function childView(child) {
     <div class="child-avatar">${renderChildPortrait(child, child.stage, { mode: 'face' })}</div>
     <div class="child-info">
       <b>${escapeHtml(child.name)}</b>
-      <span>${stageLabel} · ${escapeHtml(parent?.name || 'family')}'s child · born day ${child.bornDay}</span>
+      <span>${stageLabel} · ${escapeHtml(parent?.name || 'family')}'s offspring</span>
     </div>
     <div class="child-actions">
       ${child.stage < 3
@@ -794,8 +792,8 @@ function ledgerView() {
 
     <div class="ledger-grid">
       <div class="stat-card">${icon('heart')}<b>${totalMarriages()}</b><span>marriages</span></div>
-      <div class="stat-card">${icon('family')}<b>${data.children.length}</b><span>children</span></div>
-      <div class="stat-card">${icon('work')}<b>${grown}</b><span>grown children</span></div>
+      <div class="stat-card">${icon('family')}<b>${data.children.length}</b><span>offspring</span></div>
+      <div class="stat-card">${icon('work')}<b>${grown}</b><span>grown offspring</span></div>
       <div class="stat-card">${icon('coin')}<b>${data.totalEarned.toLocaleString()}</b><span>coins earned</span></div>
     </div>
 
@@ -1070,7 +1068,7 @@ function summaryModal(modal) {
     <div class="summary-rows">
       <div class="summary-row"><span>${icon('home')} Base household</span><b>+${income.base}</b></div>
       <div class="summary-row"><span>${icon('heart')} Partners at home</span><b>+${income.spouse}</b></div>
-      <div class="summary-row"><span>${icon('work')} Grown children in business</span><b>+${income.child}</b></div>
+      <div class="summary-row"><span>${icon('work')} Grown offspring in business</span><b>+${income.child}</b></div>
       <div class="summary-row total"><span>${icon('coin')} Morning income</span><b>+${income.total}</b></div>
     </div>
     <div class="summary-actions"><button class="primary-button" data-action="close-modal">Step into the day</button></div>
@@ -1080,7 +1078,7 @@ function summaryModal(modal) {
 function familyModal() {
   const spouses = getSpouses();
   return `
-    <div class="modal-head"><h3>Start a family</h3><p>Bring a child into a home built on love, care, and consent. A child costs 200 coins to welcome.</p></div>
+    <div class="modal-head"><h3>Start a family</h3><p>Welcome an offspring into a home built on love, care, and consent. Welcoming an offspring costs 200 coins.</p></div>
     <div class="modal-body">
       ${spouses.length ? `
         <p>Who would you like to start a family with?</p>
@@ -1091,8 +1089,8 @@ function familyModal() {
             <span class="menu-arrow">${game.data.coins < 200 ? 'Need 200 coins' : '200 coins'}</span>
           </button>`).join('')}
         </div>
-        <div class="house-note" style="margin-top:15px">${icon('check')} <span>Children are welcomed as dependents and raised with care. They do not work. When they are grown (18+), they may choose to join the family business.</span></div>
-      ` : `<div class="empty-family"><b>The house is not ready yet.</b><p>Marry someone first, then you can decide together when to welcome a child.</p></div>`}
+        <div class="house-note" style="margin-top:15px">${icon('check')} <span>Offspring are welcomed as dependents and raised with care. They do not work. When they are grown, they may choose to join the family business.</span></div>
+      ` : `<div class="empty-family"><b>The house is not ready yet.</b><p>Marry someone first, then you can decide together when to welcome an offspring.</p></div>`}
     </div>
   `;
 }
@@ -1121,12 +1119,12 @@ function ceremonyModal(modal) {
       <div class="ceremony">
         <div class="ceremony-rings">${icon('star')}</div>
         <h3>Your full house</h3>
-        <p>Six hearts chose you. Three children grew up and chose the family business. The little house on the lane became a home with too many chairs, too much laughter, and a porch light that never goes out.</p>
+        <p>Six hearts chose you. Three offspring grew up and chose the family business. The little house on the lane became a home with too many chairs, too much laughter, and a porch light that never goes out.</p>
         <div class="portrait-pair" style="height:180px">
           <span style="width:210px;height:180px">${renderPlayerPortrait(game.data.player, { mode: 'bust' })}</span>
           <span style="width:210px;height:180px">${renderPortrait(getSpouses()[0] || CHARACTERS[0], { mode: 'bust' })}</span>
         </div>
-        <p style="margin-top:12px"><b>${game.data.totalEarned.toLocaleString()} coins earned · ${game.data.children.length} children · ${totalMarriages()} marriages</b></p>
+        <p style="margin-top:12px"><b>${game.data.totalEarned.toLocaleString()} coins earned · ${game.data.children.length} offspring · ${totalMarriages()} marriages</b></p>
         <div class="ceremony-actions">
           <button class="primary-button" data-action="close-modal">Keep living the story</button>
         </div>
@@ -1196,8 +1194,8 @@ function aboutModal() {
     <div class="modal-body">
       <div class="about-list">
         <div class="about-item">${icon('heart')}<div><b>Six adult romances</b><span>Aiko, Mei, Rin, Yuna, Hana, and Sora are all adults aged 24–31. Every relationship is consensual and grows through affection, dates, and honest choices.</span></div></div>
-        <div class="about-item">${icon('home')}<div><b>Build a household</b><span>Marry the women you love, welcome children into a caring home, and watch the family grow. Marriage is optional; the story always moves at your pace.</span></div></div>
-        <div class="about-item">${icon('family')}<div><b>Children are cared for, not employed</b><span>Children are dependents. They never work. Once a child is grown (18+), they may choose to join the family business and contribute to the household.</span></div></div>
+        <div class="about-item">${icon('home')}<div><b>Build a household</b><span>Marry the women you love, welcome offspring into a caring home, and watch the family grow. Marriage is optional; the story always moves at your pace.</span></div></div>
+        <div class="about-item">${icon('family')}<div><b>Offspring are cared for, not employed</b><span>Offspring are dependents. They never work. Once grown, they may choose to join the family business and contribute to the household.</span></div></div>
         <div class="about-item">${icon('sparkle')}<div><b>Non-explicit by design</b><span>This is a romantic, non-explicit game. The art is tasteful and the focus is on affection, companionship, family, and the everyday magic of a small town.</span></div></div>
         <div class="about-item">${icon('check')}<div><b>Autosaves locally</b><span>Your story is stored in your browser. The menu can save, load, rename your character, or start over.</span></div></div>
       </div>
@@ -1213,9 +1211,9 @@ function guideModal() {
       <div class="about-list">
         <div class="about-item">${icon('heart')}<div><b>1. Spend time with someone</b><span>Visit a location in town. Chat and flirt to raise affection, or bring a gift that matches her taste. Energy limits how much you can do before resting.</span></div></div>
         <div class="about-item">${icon('moon')}<div><b>2. Date, propose, marry</b><span>At 30% affection you can ask her on a date. At 80% — and while dating — you can propose. A wedding makes it official and brings a partner into your household.</span></div></div>
-        <div class="about-item">${icon('work')}<div><b>3. Work and grow</b><span>Work a shift for coins. Rest to start a new day, restore energy, and collect household income. Partners and grown children contribute each morning.</span></div></div>
-        <div class="about-item">${icon('family')}<div><b>4. Raise a family</b><span>Once married, welcome a child for 200 coins. Raise them through baby, little one, teen, and grown. Children do not work. Grown children (18+) can choose to join the family business.</span></div></div>
-        <div class="about-item">${icon('star')}<div><b>Dream board</b><span>Marry all six women, raise three grown children, and earn 5,000 coins to complete the family legacy. You can keep playing after the ending.</span></div></div>
+        <div class="about-item">${icon('work')}<div><b>3. Work and grow</b><span>Work a shift for coins. Rest to start a new day, restore energy, and collect household income. Partners and grown offspring contribute each morning.</span></div></div>
+        <div class="about-item">${icon('family')}<div><b>4. Raise a family</b><span>Once married, welcome an offspring for 200 coins. Raise them as they grow. Offspring do not work. Once grown, they can choose to join the family business.</span></div></div>
+        <div class="about-item">${icon('star')}<div><b>Dream board</b><span>Marry all six women, raise three grown offspring, and earn 5,000 coins to complete the family legacy. You can keep playing after the ending.</span></div></div>
       </div>
       <div class="modal-actions"><button class="primary-button" data-action="close-modal">Got it</button></div>
     </div>
@@ -1235,7 +1233,7 @@ function introModal() {
       <p style="margin-top:9px">The women of Hanami Hollow are not prizes to collect. They are people with work they love, friends who tease them, and hearts that open when someone shows up with patience and care. You will decide what kind of life you want to build.</p>
       <div class="about-list" style="margin-top:14px">
         <div class="about-item">${icon('heart')}<div><b>Meet all six</b><span>Each woman is an adult with her own favourite things, schedule, and idea of a perfect date.</span></div></div>
-        <div class="about-item">${icon('home')}<div><b>Make a home</b><span>Marry, welcome children, and raise them with care. Grown children may choose the family business.</span></div></div>
+        <div class="about-item">${icon('home')}<div><b>Make a home</b><span>Marry, welcome offspring, and raise them with care. Grown offspring may choose the family business.</span></div></div>
         <div class="about-item">${icon('sparkle')}<div><b>No rush</b><span>Autosaves locally. The story can wait for you.</span></div></div>
       </div>
       <div class="modal-actions"><button class="primary-button" data-action="close-modal">Step into town</button></div>
@@ -1486,7 +1484,7 @@ function marry(characterId) {
 function startFamily(characterId) {
   const character = characterById(characterId);
   if (game.data.coins < 200) {
-    showToast('Welcoming a child costs 200 coins. Work a shift first.', 'coin');
+    showToast('Welcoming an offspring costs 200 coins. Work a shift first.', 'coin');
     return;
   }
   game.data.coins -= 200;
@@ -1532,7 +1530,7 @@ function raiseChild(childId) {
   saveGame();
   renderAll();
   playSound(child.stage === 3 ? 'heart' : 'soft');
-  showToast(child.stage === 3 ? `${child.name} is grown (18+). They can choose to join the family business.` : `${child.name} is now a ${stageLabel.toLowerCase()}.`, 'family');
+  showToast(child.stage === 3 ? `${child.name} is grown. They can choose to join the family business.` : `${child.name} is now a ${stageLabel.toLowerCase()}.`, 'family');
   checkAchievements();
 }
 

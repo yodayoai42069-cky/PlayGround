@@ -18,11 +18,11 @@ No build step or npm dependencies are required. Fonts and artwork are bundled lo
 
 - **Meet & court:** visit the café, library, garden, arcade, bakery, and pier. Chat, flirt, give thoughtful gifts, and go on dates.
 - **Marry & build a home:** reach 80% affection while dating to propose. Each partner adds to the household's daily income.
-- **Raise a family:** welcome children (200 coins) and raise them through childhood and their teens. Children are dependents and never work.
-- **Grown children choose:** at 18+, each child decides whether to join the family business. Their contribution funds more gifts and new beginnings.
-- **Keep a legacy:** fill the ledger, unlock keepsakes, and complete the dream board by marrying all six women, raising grown children, and earning a family fortune.
+- **Raise a family:** welcome offspring (200 coins) and raise them as they grow. Offspring are dependents and never work.
+- **Grown offspring choose:** once grown, each offspring decides whether to join the family business. Their contribution funds more gifts and new beginnings.
+- **Keep a legacy:** fill the ledger, unlock keepsakes, and complete the dream board by marrying all six women, raising grown offspring, and earning a family fortune.
 
-Progress autosaves to `localStorage` under `hanami-hearts-save-v1`. All romanceable characters are adults (24–31), and the story is consensual and non-explicit.
+Progress autosaves to `localStorage` under `hanami-hearts-save-v1`. All six romanceable characters are explicitly adults (ages 24–31); the offspring's exact ages are left unspecified. The story is consensual and non-explicit.
 
 ## Project layout
 
