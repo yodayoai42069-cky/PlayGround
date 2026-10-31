@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#f6a9b8" />
+  <meta name="description" content="Maple Hollow — a cozy early-2000s anime dating sim about building a big, happy family in a little town." />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="favicon.svg" />
+  <title>Maple Hollow — A Second-Spring Story</title>
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/splash.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/map.css" />
+  <link rel="stylesheet" href="css/screens.css" />
+  <link rel="stylesheet" href="css/creator.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+  <div id="app">
+    <section id="splash" class="splash" aria-label="Maple Hollow title screen">
+      <div class="splash-sky" aria-hidden="true">
+        <div class="splash-sun"></div>
+        <div class="cloud cloud-a"></div>
+        <div class="cloud cloud-b"></div>
+        <div class="cloud cloud-c"></div>
+        <div class="petal p1"></div><div class="petal p2"></div><div class="petal p3"></div>
+        <div class="petal p4"></div><div class="petal p5"></div><div class="petal p6"></div>
+      </div>
+      <header class="splash-nav">
+        <div class="splash-brand">
+          <span class="brand-mark"><span class="brand-heart">♥</span></span>
+          <span class="brand-word">MAPLE HOLLOW</span>
+        </div>
+        <div class="splash-meta">
+          <span class="meta-pill">EARLY AUGHTS ROMANCE</span>
+          <span class="meta-pill hot">POLYAMORY WELCOME</span>
+        </div>
+      </header>
+
+      <main class="splash-main">
+        <div class="splash-copy">
+          <div class="splash-kicker"><span></span> A SECOND-SPRING STORY <span></span></div>
+          <h1 class="logo">
+            <span class="logo-maple">Maple</span>
+            <span class="logo-hollow">Hollow</span>
+          </h1>
+          <p class="splash-tagline">Fresh out of college. Five hundred dollars. A whole town full of people who might just be your future.</p>
+          <p class="splash-copy-small">Date, marry, build a family, and grow a very unconventional household in a town where love has never been a zero-sum game.</p>
+          <div class="splash-actions">
+            <button id="startBtn" class="btn btn-primary btn-hero" type="button">Start</button>
+            <button id="continueBtn" class="btn btn-cream btn-hero" type="button" hidden>Continue</button>
+          </div>
+          <div class="splash-note"><span class="dot"></span> Autosaves in your browser <span class="dot"></span> Built for portrait &amp; landscape</div>
+        </div>
+
+        <div class="hero-stage" aria-hidden="true">
+          <div class="hero-burst"></div>
+          <div class="hero-spark s1">✦</div>
+          <div class="hero-spark s2">✦</div>
+          <div class="hero-spark s3">✧</div>
+          <div class="hero-spark s4">✧</div>
+          <div id="heroCast" class="hero-cast"></div>
+          <div class="hero-sticker sticker-date">
+            <span class="sticker-icon">☕</span>
+            <span><b>Bean There Café</b><small>3 new regulars</small></span>
+          </div>
+          <div class="hero-sticker sticker-heart">
+            <span class="sticker-icon">♥</span>
+            <span><b>9 hearts &amp; rising</b><small>one very lucky town</small></span>
+          </div>
+          <div class="hero-sticker sticker-cal">
+            <span class="sticker-icon">☀</span>
+            <span><b>Summer Splash</b><small>JUN 14–20 · 2003</small></span>
+          </div>
+        </div>
+      </main>
+
+      <footer class="splash-footer">
+        <div class="splash-footer-left"><span class="mini-heart">♥</span> A tiny town. A big heart. A whole lot of spouses.</div>
+        <div class="splash-footer-right">Est. 2003 · Petal Lane</div>
+      </footer>
+      <div class="splash-grain" aria-hidden="true"></div>
+    </section>
+
+    <section id="game" class="game" hidden aria-label="Maple Hollow game">
+      <header class="topbar">
+        <button class="top-brand" data-action="go-screen" data-screen="map" aria-label="Go to town map">
+          <span class="brand-mark small"><span class="brand-heart">♥</span></span>
+          <span class="top-brand-copy"><b>MAPLE HOLLOW</b><small>a second-spring story</small></span>
+        </button>
+
+        <div class="hud">
+          <div class="hud-pill money-pill" title="Your spending money">
+            <span class="hud-icon">$</span>
+            <span><small>FUNDS</small><b id="hudFunds">$500</b></span>
+          </div>
+          <div class="hud-pill date-pill" title="Current date and time">
+            <span class="hud-icon" id="hudPhaseIcon">☀</span>
+            <span><small id="hudDate">SUN · JUN 14</small><b id="hudTime">9:00 AM</b></span>
+          </div>
+          <div class="hud-pill energy-pill" title="Energy and sleep debt">
+            <span class="hud-icon">⚡</span>
+            <span class="energy-copy"><small>ENERGY</small><span class="energy-bar"><i id="hudEnergyBar"></i></span></span>
+            <b id="hudEnergy">100</b>
+          </div>
+        </div>
+
+        <div class="top-actions">
+          <button class="icon-btn" data-action="save" aria-label="Save game" title="Save game"><span id="saveIcon"></span></button>
+          <button class="icon-btn" data-action="toggle-sound" aria-label="Toggle sound" title="Toggle sound"><span id="soundIcon"></span></button>
+          <button class="icon-btn" data-action="toggle-fullscreen" aria-label="Toggle fullscreen" title="Toggle fullscreen"><span id="fullIcon"></span></button>
+        </div>
+      </header>
+
+      <div class="game-shell">
+        <aside class="sidebar" aria-label="Main navigation">
+          <div class="sidebar-me" id="sidebarMe"></div>
+          <nav class="nav-list" id="navList"></nav>
+          <div class="sidebar-event" id="sidebarEvent"></div>
+          <div class="sidebar-footer">
+            <button class="text-btn" data-action="open-help">How to play</button>
+            <button class="text-btn danger" data-action="new-game">New life</button>
+          </div>
+        </aside>
+
+        <main class="main-scroll" id="mainScroll">
+          <div id="view" class="view"></div>
+        </main>
+
+        <aside class="right-rail" id="rightRail"></aside>
+      </div>
+
+      <nav class="mobile-nav" id="mobileNav" aria-label="Mobile navigation"></nav>
+    </section>
+
+    <div id="overlayRoot" class="overlay-root" aria-live="polite"></div>
+    <div id="toastRoot" class="toast-root" aria-live="polite"></div>
+    <div id="confettiRoot" class="confetti-root" aria-hidden="true"></div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

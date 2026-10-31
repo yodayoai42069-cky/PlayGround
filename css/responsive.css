@@ -1,0 +1,101 @@
+/* Device polish: small phones, landscape phones, and motion preferences. */
+@supports (padding: max(0px)) {
+  .game { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+  .creator-top { padding-top: max(10px, env(safe-area-inset-top)); }
+}
+
+@media (max-width: 1180px) {
+  .view { max-width: 1000px; }
+}
+@media (max-width: 860px) {
+  .top-actions .icon-btn:not(:first-child) { display: none; }
+  .top-actions .icon-btn:first-child { display: inline-flex; }
+  .view { max-width: 760px; }
+  .modal-wrap { padding: 10px; align-items: flex-end; }
+  .modal { max-height: 92dvh; width: 100%; border-radius: 24px 24px 18px 18px; }
+  .modal.wide, .modal.slim { width: 100%; }
+  .toast-root { bottom: calc(78px + var(--safe-bottom)); right: 12px; }
+  .view-head h1 { font-size: 30px; }
+}
+@media (max-width: 560px) {
+  .view { padding: 13px 11px 25px; }
+  .view-head p.sub { font-size: 10px; }
+  .section-head { margin: 17px 0 9px; }
+  .modal-top { padding: 16px 16px 10px; }
+  .modal-top h2 { font-size: 21px; }
+  .modal-body { padding: 0 16px 18px; }
+  .modal-footer { padding: 11px 16px max(14px, env(safe-area-inset-bottom)); }
+  .modal-footer .btn { flex: 1; min-width: 0; }
+  .filter-row { gap: 4px; }
+  .filter-chip { padding: 4px 8px; font-size: 8px; min-height: 28px; }
+  .profile-title-card { padding: 14px; }
+  .profile-title-card h1 { font-size: 31px; }
+  .dialogue-card p { font-size: 14px; }
+  .profile-stats { gap: 5px; }
+  .portrait-stage { min-height: 330px; }
+  .portrait-stage .avatar-svg { height: 380px; margin-bottom: -45px; }
+  .gift-grid { gap: 5px; }
+  .gift-card small { display: none; }
+  .gift-card { min-height: 118px; }
+  .holiday-banner { align-items: flex-start; }
+  .holiday-emblem { width: 50px; height: 50px; border-radius: 15px; }
+  .holiday-banner h2 { font-size: 22px; }
+  .holiday-newbies { display: grid; grid-template-columns: 1fr; }
+  .creator-group { margin-bottom: 13px; }
+  .creator-panel-foot { flex-direction: column-reverse; gap: 6px; }
+  .creator-panel-foot .btn { width: 100%; }
+}
+
+@media (max-height: 660px) and (min-width: 721px) {
+  .creator-top { min-height: 52px; padding-top: 5px; padding-bottom: 5px; }
+  .creator-panel-top { padding-top: 11px; }
+  .creator-panel-top h2 { font-size: 19px; }
+  .creator-panel-top p { display: none; }
+  .creator-tabs { padding-top: 8px; }
+  .creator-controls { padding-top: 10px; }
+  .creator-panel-foot { padding-top: 8px; padding-bottom: 8px; }
+  .creator-stage { min-height: 0; }
+  .creator-preview { max-height: 76vh; }
+}
+@media (max-height: 540px) and (min-width: 721px) and (orientation: landscape) {
+  .creator-shell { grid-template-columns: minmax(200px, .65fr) minmax(390px, 1.35fr); }
+  .creator-stage { padding-bottom: 0; }
+  .creator-stage-card { display: none; }
+  .creator-panel-top p { display: none; }
+  .creator-panel-top h2 { font-size: 17px; }
+  .creator-controls { padding: 8px 14px 10px; }
+  .creator-panel-foot { padding: 7px 14px; }
+  .creator-panel-foot .btn { min-height: 38px; }
+}
+
+@media (max-width: 390px) {
+  .hud-pill b { font-size: 9px; }
+  .money-pill .hud-icon { width: 21px; height: 21px; font-size: 12px; }
+  .energy-pill .energy-copy small { font-size: 5.5px; }
+  .energy-copy .energy-bar { width: 31px; }
+  .top-actions .icon-btn { width: 30px; height: 30px; }
+  .logo { font-size: 54px; }
+  .hero-stage { min-height: 335px; }
+  .hero-cast { height: 335px; }
+  .hero-person:nth-child(1), .hero-person:nth-child(3) { width: 145px; }
+  .hero-person:nth-child(2) { width: 185px; }
+  .hero-person:nth-child(4) { width: 125px; }
+  .sticker-cal { display: none; }
+  .suitor-portrait { height: 210px; }
+  .date-pill { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* Big screens: give the town some breathing room. */
+@media (min-width: 1500px) {
+  .game-shell { grid-template-columns: 248px minmax(0, 1fr) 312px; }
+  .view { padding: 27px 30px 42px; max-width: 1220px; }
+}
