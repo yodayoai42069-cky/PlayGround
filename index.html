@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Petal Town Hearts — an Early Aughts Anime Dating Sim</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=VT323&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header id="hud">
+    <div class="hud-left">
+      <span class="logo">🌸 <b>Petal Town Hearts</b><i>~ early aughts edition ~</i></span>
+    </div>
+    <div class="hud-stats">
+      <span class="stat money" id="statMoney">$10,000</span>
+      <span class="stat" id="statDay">📅 Day 1</span>
+      <span class="stat" id="statAp">⚡ 4/4</span>
+      <span class="stat" id="statFamily">👨‍👩‍👧‍👦 0</span>
+      <span class="stat perk" id="statPerks">✨ Lv.0</span>
+    </div>
+    <div class="hud-goal">
+      <div class="goal-bar"><i id="goalFill"></i></div>
+      <span id="goalText">Happy Life: 0/5 wives · 0/8 kids</span>
+    </div>
+  </header>
+
+  <main id="layout">
+    <section id="stage">
+      <div id="mapWrap">
+        <svg id="map" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+      <div id="scene"></div>
+      <div id="logWrap">
+        <div class="log-title">📖 Diary</div>
+        <ul id="log"></ul>
+      </div>
+    </section>
+
+    <aside id="rail">
+      <div class="rail-head">
+        <div id="menuTitle">Main Menu</div>
+        <div id="menuHint">Use ▲ ▼ to scroll &amp; select · Enter / click to choose</div>
+      </div>
+      <div id="menuList" tabindex="0"></div>
+      <div class="rail-btns">
+        <button id="btnUp" class="rail-btn up" title="Scroll up / previous option">▲<small>PREV</small></button>
+        <button id="btnDown" class="rail-btn down" title="Scroll down / next option">▼<small>NEXT</small></button>
+      </div>
+    </aside>
+  </main>
+
+  <div id="toast"></div>
+  <div id="modal" class="hidden"></div>
+
+  <script src="js/traits.js"></script>
+  <script src="js/portrait.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/ui.js"></script>
+</body>
+</html>
