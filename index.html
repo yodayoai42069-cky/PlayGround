@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#140f0b" />
+<title>Kagerō High — Love, Ninjutsu &amp; Property Damage</title>
+<meta name="description" content="A comedy visual novel. Three girls, nine endings, one catastrophe-prone shinobi." />
+<link rel="stylesheet" href="styles/fonts.css" />
+<link rel="stylesheet" href="styles/base.css" />
+<link rel="stylesheet" href="styles/ui.css" />
+<link rel="stylesheet" href="styles/stage.css" />
+</head>
+<body>
+<div id="app" data-screen="boot">
+
+  <!-- ============ BOOT ============ -->
+  <div id="boot" class="boot">
+    <div class="boot-mark" aria-hidden="true">
+      <svg viewBox="0 0 120 120"><use href="#seal-kagero"/></svg>
+    </div>
+    <p class="boot-text">Unsealing the scroll…</p>
+  </div>
+
+  <!-- ============ TITLE ============ -->
+  <section id="screen-title" class="screen screen-title" aria-label="Title screen">
+    <div class="title-sky" id="title-sky" aria-hidden="true"></div>
+    <div class="title-vignette" aria-hidden="true"></div>
+
+    <header class="title-logo">
+      <p class="logo-kicker">A Shinobi Romantic Comedy</p>
+      <h1 class="logo-main">
+        <span class="logo-jp" aria-hidden="true">陽炎</span>
+        <span class="logo-en">KAGERŌ</span>
+        <span class="logo-high">HIGH</span>
+      </h1>
+      <p class="logo-sub">Love, Ninjutsu &amp; Property Damage</p>
+    </header>
+
+    <div class="title-cast" id="title-cast" aria-hidden="true"></div>
+
+    <nav class="title-menu" aria-label="Main menu">
+      <button class="menu-item" data-action="new">New Game<span class="menu-jp">はじめ</span></button>
+      <button class="menu-item" data-action="continue" id="btn-continue">Continue<span class="menu-jp">つづき</span></button>
+      <button class="menu-item" data-action="gallery">Endings<span class="menu-jp">結末</span></button>
+      <button class="menu-item" data-action="settings">Settings<span class="menu-jp">設定</span></button>
+      <button class="menu-item" data-action="about">Credits<span class="menu-jp">記録</span></button>
+    </nav>
+
+    <footer class="title-foot">
+      <span class="foot-seal">九</span>
+      <span>Three girls. Nine endings. One very breakable protagonist.</span>
+    </footer>
+  </section>
+
+  <!-- ============ GAME ============ -->
+  <section id="screen-game" class="screen screen-game" aria-label="Story">
+    <div id="stage" class="stage">
+      <div class="bg-layer" id="bg-layer"></div>
+      <div class="bg-layer bg-layer--far" id="bg-layer-far"></div>
+      <div class="fx-layer" id="fx-weather"></div>
+      <div class="sprite-layer" id="sprite-layer"></div>
+      <div class="fx-layer" id="fx-front"></div>
+      <div class="letterbox" id="letterbox"></div>
+      <div class="stage-vignette"></div>
+      <div class="chapter-card" id="chapter-card"><span class="cc-jp"></span><span class="cc-en"></span></div>
+    </div>
+
+    <div class="hud">
+      <div class="hud-left">
+        <span class="hud-chapter" id="hud-chapter">Prologue</span>
+        <span class="hud-affection" id="hud-affection" aria-label="Affection"></span>
+      </div>
+      <div class="hud-right">
+        <button class="icon-btn" data-action="history" title="Backlog (H)" aria-label="Backlog">記</button>
+        <button class="icon-btn" data-action="auto" title="Auto play (A)" aria-label="Auto play">自</button>
+        <button class="icon-btn" data-action="skip" title="Skip (S)" aria-label="Skip">送</button>
+        <button class="icon-btn" data-action="save" title="Save / Load (Esc)" aria-label="Save menu">録</button>
+        <button class="icon-btn" data-action="menu" title="Menu (Esc)" aria-label="Menu">目</button>
+      </div>
+    </div>
+
+    <div class="dialogue" id="dialogue" role="log" aria-live="polite">
+      <div class="dialogue-frame">
+        <div class="name-plate" id="name-plate"><span></span></div>
+        <div class="dialogue-text" id="dialogue-text"></div>
+        <div class="dialogue-next" id="dialogue-next" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 7l8 9 8-9" /></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="choices" id="choices" role="group" aria-label="Choices"></div>
+
+    <div class="tap-zone" id="tap-zone" aria-hidden="true"></div>
+  </section>
+
+  <!-- ============ GALLERY ============ -->
+  <section id="screen-gallery" class="screen screen-panel" aria-label="Endings gallery">
+    <div class="panel-head">
+      <button class="back-btn" data-action="back">← Back</button>
+      <h2>Endings <span class="panel-jp">結末</span></h2>
+      <p class="panel-sub" id="gallery-count">0 / 9 discovered</p>
+    </div>
+    <div class="gallery-grid" id="gallery-grid"></div>
+  </section>
+
+  <!-- ============ SETTINGS ============ -->
+  <section id="screen-settings" class="screen screen-panel" aria-label="Settings">
+    <div class="panel-head">
+      <button class="back-btn" data-action="back">← Back</button>
+      <h2>Settings <span class="panel-jp">設定</span></h2>
+    </div>
+    <div class="settings-body">
+      <label class="setting">
+        <span>Text speed</span>
+        <input type="range" id="set-speed" min="0" max="100" value="55" />
+        <output id="set-speed-out">55</output>
+      </label>
+      <label class="setting">
+        <span>Auto-advance delay</span>
+        <input type="range" id="set-auto" min="500" max="4000" step="100" value="1600" />
+        <output id="set-auto-out">1.6s</output>
+      </label>
+      <label class="setting">
+        <span>Music</span>
+        <input type="range" id="set-bgm" min="0" max="100" value="45" />
+        <output id="set-bgm-out">45</output>
+      </label>
+      <label class="setting">
+        <span>Effects</span>
+        <input type="range" id="set-sfx" min="0" max="100" value="60" />
+        <output id="set-sfx-out">60</output>
+      </label>
+      <label class="setting setting--toggle">
+        <span>Animated sprites</span>
+        <input type="checkbox" id="set-anim" checked />
+        <i class="switch" aria-hidden="true"></i>
+      </label>
+      <label class="setting setting--toggle">
+        <span>Screen shake &amp; flashes</span>
+        <input type="checkbox" id="set-shake" checked />
+        <i class="switch" aria-hidden="true"></i>
+      </label>
+      <label class="setting setting--toggle">
+        <span>Reduce motion</span>
+        <input type="checkbox" id="set-motion" />
+        <i class="switch" aria-hidden="true"></i>
+      </label>
+      <div class="setting-actions">
+        <button class="ink-btn" data-action="wipe">Erase all save data</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SAVE / LOAD ============ -->
+  <section id="screen-saves" class="screen screen-panel" aria-label="Save and load">
+    <div class="panel-head">
+      <button class="back-btn" data-action="back">← Back</button>
+      <h2 id="saves-title">Save <span class="panel-jp">記録</span></h2>
+    </div>
+    <div class="save-grid" id="save-grid"></div>
+    <div class="panel-foot">
+      <button class="ink-btn ghost" data-action="load-mode" id="btn-mode">Switch to LOAD</button>
+      <button class="ink-btn ghost" data-action="title">Return to title</button>
+    </div>
+  </section>
+
+  <!-- ============ HISTORY ============ -->
+  <section id="screen-history" class="screen screen-panel" aria-label="Backlog">
+    <div class="panel-head">
+      <button class="back-btn" data-action="back">← Back</button>
+      <h2>Backlog <span class="panel-jp">履歴</span></h2>
+    </div>
+    <div class="history-list" id="history-list"></div>
+  </section>
+
+  <!-- ============ ABOUT ============ -->
+  <section id="screen-about" class="screen screen-panel" aria-label="Credits">
+    <div class="panel-head">
+      <button class="back-btn" data-action="back">← Back</button>
+      <h2>Credits <span class="panel-jp">記録</span></h2>
+    </div>
+    <div class="about-body">
+      <p class="about-lead">Kagerō High is an original comedy visual novel. Every character, still, and note of music in it was generated for this project — no borrowed art, no stock photography.</p>
+      <dl class="about-list">
+        <dt>Story &amp; direction</dt><dd>Original screenplay in nine parts</dd>
+        <dt>Art</dt><dd>Procedural vector anime stills, drawn at runtime in a bold ink-and-cel style</dd>
+        <dt>Character sprites</dt><dd>Parametric SVG puppets with blinking, lip-flap, and hair sway</dd>
+        <dt>Music &amp; sound</dt><dd>Synthesised live with the Web Audio API</dd>
+        <dt>Engine</dt><dd>Hand-rolled visual novel interpreter</dd>
+      </dl>
+      <p class="about-note">Content note: romantic comedy with slapstick peril, innuendo-free fanservice gags, and three downbeat endings. All characters are 18 or older. Yui is the protagonist's stepsister by adoption and shares no blood relation.</p>
+      <p class="about-note small">Tip: press <kbd>Space</kbd> to advance, <kbd>H</kbd> for backlog, <kbd>Esc</kbd> for the menu, and click the little seal on the name plate to replay a line's voice-less… nothing. It just looks nice.</p>
+    </div>
+  </section>
+
+  <!-- ============ MODAL ============ -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal-card">
+      <h3 id="modal-title">Menu</h3>
+      <p id="modal-body"></p>
+      <div class="modal-actions" id="modal-actions"></div>
+    </div>
+  </div>
+
+  <div class="ending-card" id="ending-card" hidden>
+    <div class="ec-inner">
+      <p class="ec-kicker">Ending Unlocked</p>
+      <h2 class="ec-title" id="ec-title"></h2>
+      <p class="ec-route" id="ec-route"></p>
+      <p class="ec-tone" id="ec-tone"></p>
+      <button class="ink-btn" data-action="ending-close">Continue</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <div class="rotate-hint" id="rotate-hint">
+    <div>
+      <strong>Turn your device sideways</strong>
+      <span>Kagerō High reads best in landscape.</span>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

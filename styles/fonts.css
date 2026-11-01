@@ -1,0 +1,42 @@
+/* ============================================================
+   Kagerō High — typography
+   Subsetted woff2 faces are generated into assets/fonts/.
+   Fallback stacks keep the game readable if a face is missing.
+   ============================================================ */
+
+@font-face {
+  font-family: 'Yuji Syuku';
+  src: url('../assets/fonts/yuji-subset.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Zen Maru Gothic';
+  src: url('../assets/fonts/zen400-subset.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Zen Maru Gothic';
+  src: url('../assets/fonts/zen700-subset.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Zen Maru Gothic';
+  src: url('../assets/fonts/zen900-subset.woff2') format('woff2');
+  font-weight: 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Shippori Mincho';
+  src: url('../assets/fonts/mincho400-subset.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Shippori Mincho';
+  src: url('../assets/fonts/mincho600-subset.woff2') format('woff2');
+  font-weight: 600;
+  font-display: swap;
+}
